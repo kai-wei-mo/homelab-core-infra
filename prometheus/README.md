@@ -7,6 +7,7 @@ helm show values prometheus-community/kube-prometheus-stack \
 
 helm template prometheus prometheus-community/kube-prometheus-stack \
   --version 80.7.0 \
+  --include-crds \
   -n monitoring \
   -f values-custom.yaml \
   > install.yaml
