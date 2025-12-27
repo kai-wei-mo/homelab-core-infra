@@ -1,0 +1,28 @@
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    serviceMonitorSelectorNilUsesHelmValues: false
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - prometheus.kwm.local
+    paths:
+      - /
+    pathType: Prefix
+
+grafana:
+  enabled: false
+
+alertmanager:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeProxy:
+  enabled: false
