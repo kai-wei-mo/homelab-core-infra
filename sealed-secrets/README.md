@@ -10,6 +10,7 @@ helm show values sealed-secrets/sealed-secrets \
 
 helm template sealed-secrets sealed-secrets/sealed-secrets \
   --version 2.18.3 \
+  --include-crds \
   -f values-custom.yaml \
   > install.yaml
 
