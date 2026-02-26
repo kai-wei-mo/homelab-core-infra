@@ -1,0 +1,46 @@
+env:
+  TZ: America/Chicago
+  ADVERTISE_IP: "http://plex.kwm.local,https://plex.chaewon.io"
+
+envFrom:
+  - secretRef:
+      name: plex-claim
+
+service:
+  main:
+    type: ClusterIP
+    ports:
+      main:
+        port: 32400
+
+ingress:
+  main:
+    enabled: true
+    ingressClassName: traefik
+
+    hosts:
+      - host: plex.kwm.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+      - host: plex.chaewon.io
+        paths:
+          - path: /
+            pathType: Prefix
+
+persistence:
+  config:
+    enabled: true
+    size: 10Gi
+  media:
+    enabled: true
+    type: hostPath
+    hostPath: /srv/samba/plex
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    memory: 2Gi

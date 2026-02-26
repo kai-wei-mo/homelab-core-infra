@@ -1,0 +1,164 @@
+---
+# Source: plex/templates/common.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: plex-config
+  labels:
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: plex
+    app.kubernetes.io/version: 1.43.0
+    helm.sh/chart: plex-7.3.0
+  annotations:
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
+---
+# Source: plex/templates/common.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+  labels:
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: plex
+    app.kubernetes.io/version: 1.43.0
+    helm.sh/chart: plex-7.3.0
+  annotations:
+spec:
+  type: ClusterIP
+  ports:
+  - port: 32400
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app.kubernetes.io/name: plex
+    app.kubernetes.io/instance: plex
+---
+# Source: plex/templates/common.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  labels:
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: plex
+    app.kubernetes.io/version: 1.43.0
+    helm.sh/chart: plex-7.3.0
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: plex
+      app.kubernetes.io/instance: plex
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: plex
+        app.kubernetes.io/instance: plex
+    spec:
+      
+      serviceAccountName: default
+      automountServiceAccountToken: true
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      containers:
+        - name: plex
+          image: "ghcr.io/home-operations/plex:1.43.0"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ADVERTISE_IP
+              value: http://plex.kwm.local,https://plex.chaewon.io
+            - name: TZ
+              value: America/Chicago
+          envFrom:
+            - secretRef:
+                name: plex-claim
+          ports:
+            - name: http
+              containerPort: 32400
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /srv/samba/plex
+          livenessProbe:
+            tcpSocket:
+              port: 32400
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 32400
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 32400
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 5
+          resources:
+            limits:
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: plex-config
+        - name: media
+          hostPath:
+            path: /srv/samba/plex
+---
+# Source: plex/templates/common.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: plex
+  labels:
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: plex
+    app.kubernetes.io/version: 1.43.0
+    helm.sh/chart: plex-7.3.0
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "plex.kwm.local"
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: plex
+                port:
+                  number: 32400
+    - host: "plex.chaewon.io"
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: plex
+                port:
+                  number: 32400
