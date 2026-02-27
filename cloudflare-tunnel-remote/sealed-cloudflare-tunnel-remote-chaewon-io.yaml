@@ -1,0 +1,14 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: cloudflare-tunnel-remote-chaewon-io
+  namespace: networking
+spec:
+  encryptedData:
+    token: AgBptUKDB3TRKaSIqne+zMBpy6fFa6tlzI7Ln+DNoKXb1uusihrS3ZLEOZ8Cg+FyWJDQme/l2G+HDaW6OYNKgrpGcBi7C1J6aUSou2mGzWzaB3TO2HlxfrGa+r2mNwGcRSBQInfaFZolnm5jRIi25kFQyQrasJoT2JlCWh1F/9wFppYmoagtLraxHDbeoP5KYJRxxDUXjS/04jaR6fFSePSDeaZXBkfk61m2D6uuo7AXCpmL3ze7j/WaS4HPFgv23ePDLNEDIjP8+sC/kfLtUrecjYqbQY1WfAtaAtx0TIwXFYGlNnBbrfCSrrp6jw+fRYSNzxQdYKRx+12hZBd2licdHcxZh0fkBGubF0C4SYlrVt84u+s4ql/2z7bxZouOwK07uMVlcVFj0vtAQaeUO8JKReHWx5M51tRaePSxyMJRdoxKxubnjXAjrpna4iVKcLOPGyhQNxW2vf/+756ThvzLl2SyhSI4VC/t/f1NcfDgbvE0PiR6/e+ciXz4KFFdE2BCYgMKefUwBvzvooeSKkknLC8qSbw6cp8NhALomuNcWEG0j9RGpiCbW8fH27qTeFpVzZBad+WJTNZ6Yd7wc3nRjozZscy2anWTN7vTWbjJQQ9WOOdVKE3Q7Tk9lF8Zh4U5W5Dh9jOLyOoMxLSd3x7Ex0rVMZ0f8XwkPvKFOp0U5Yn2vpTnjiQa5RfzizmYp1ApesG6N3BeXIcew8YW5PSF1XSXi/85/Mi4D7jie917alIMldOTBUOGzrGlc6nJ7iuznObMbnSQ364NURcYuKAthF5p6y1lrBpTaWtSegA5YhPbaB5mKS0tdqbhaaicX1Qu1uAmXo2ls8A2bBIJzbAGSKiAzUBWkcKAh2VuVlZtd0nmIOQDmj5E2MHuljrRGrnNlURC3Vd8vP2U2LbNbEhg66w+LiLcgrLF1FLeGLpFF4Xw6NMOPOjs
+  template:
+    metadata:
+      name: cloudflare-tunnel-remote-chaewon-io
+      namespace: networking
+    type: Opaque

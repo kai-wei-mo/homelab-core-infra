@@ -1,0 +1,86 @@
+---
+# Source: cloudflare-tunnel-remote/templates/serviceaccount.yaml
+# Here we create a service account with no privileges to run the
+# deployment - just in case the default service account is different.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: plex-cloudflare-tunnel-remote
+  labels:
+    helm.sh/chart: cloudflare-tunnel-remote-0.1.2
+    app.kubernetes.io/name: cloudflare-tunnel-remote
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: cloudflare-tunnel-remote/templates/secret.yaml
+# This credentials secret allows cloudflared to authenticate itself
+# to the Cloudflare infrastructure.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: plex-cloudflare-tunnel-remote
+  labels:
+    helm.sh/chart: cloudflare-tunnel-remote-0.1.2
+    app.kubernetes.io/name: cloudflare-tunnel-remote
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+stringData:
+  tunnelToken: REPLACE_ME
+---
+# Source: cloudflare-tunnel-remote/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex-cloudflare-tunnel-remote
+  labels:
+    helm.sh/chart: cloudflare-tunnel-remote-0.1.2
+    app.kubernetes.io/name: cloudflare-tunnel-remote
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: cloudflared
+  template:
+    metadata:
+      creationTimestamp: null
+      annotations:
+        # These are here so the deployment rolls when the config or secret change.
+        checksum/secret: 903ba207b84ac41d9160e985b758ac2fdbfac83e53cf9417c3f585451770f5ee
+      labels:
+        pod: cloudflared
+    spec:
+      serviceAccountName: plex-cloudflare-tunnel-remote
+      containers:
+      - name: cloudflared
+        image: "cloudflare/cloudflared:latest"
+        imagePullPolicy: IfNotPresent
+        command:
+          - cloudflared
+          - tunnel
+          # We can regulate the cloudflared version via an image tag.
+          - --no-autoupdate
+          # In a k8s environment, the metrics server needs to listen outside the pod it runs on.
+          # The address 0.0.0.0:2000 allows any pod in the namespace.
+          - --metrics
+          - 0.0.0.0:2000
+          - run
+        env:
+        - name: TUNNEL_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: plex-cloudflare-tunnel-remote
+              key: tunnelToken
+        livenessProbe:
+          httpGet:
+            # Cloudflared has a /ready endpoint which returns 200 if and only if
+            # it has an active connection to the edge.
+            path: /ready
+            port: 2000
+          failureThreshold: 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
