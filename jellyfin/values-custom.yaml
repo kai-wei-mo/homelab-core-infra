@@ -1,0 +1,44 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/jellyfin/jellyfin
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8096
+
+persistence:
+  config:
+    enabled: true
+    size: 5Gi
+
+  media:
+    enabled: true
+    type: hostPath
+    hostPath: /srv/samba/plex
+
+  cache:
+    enabled: false
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+  hosts:
+    - host: jellyfin.kwm.local
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: jellyfin.chaewon.io
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: jellyfin-chaewon-tls
+      hosts:
+        - jellyfin.chaewon.io
+
+networkPolicy:
+  enabled: false
