@@ -134,8 +134,8 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "jellyfin.chaewon.io"
-      secretName: jellyfin-chaewon-tls
+        - "jellyfin.kwm.local"
+      secretName: kwm-local-wildcard
   rules:
     - host: "jellyfin.kwm.local"
       http:

@@ -11,6 +11,10 @@ prometheus:
     paths:
       - /
     pathType: Prefix
+    tls:
+      - secretName: kwm-local-wildcard
+        hosts:
+          - prometheus.kwm.local
 
 grafana:
   enabled: false

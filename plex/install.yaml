@@ -141,6 +141,10 @@ metadata:
     helm.sh/chart: plex-7.3.0
 spec:
   ingressClassName: traefik
+  tls:
+    - hosts:
+        - "plex.kwm.local"
+      secretName: "kwm-local-wildcard"
   rules:
     - host: "plex.kwm.local"
       http:

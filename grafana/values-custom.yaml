@@ -4,6 +4,20 @@ adminPassword: admin   # OK for private network
 service:
   type: ClusterIP
 
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+  path: /
+  pathType: Prefix
+  hosts:
+    - grafana.kwm.local
+  tls:
+    - secretName: kwm-local-wildcard
+      hosts:
+        - grafana.kwm.local
+
 datasources:
   datasources.yaml:
     apiVersion: 1

@@ -10,6 +10,7 @@ helm show values jellyfin/jellyfin \
 
 helm template jellyfin jellyfin/jellyfin \
   --version 2.7.0 \
+  -n jellyfin \
   -f values-custom.yaml \
   > install.yaml
 
