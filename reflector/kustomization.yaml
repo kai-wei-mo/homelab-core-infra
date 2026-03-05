@@ -5,3 +5,5 @@ namespace: reflector
 
 resources:
   - install.yaml
+
+  - sealed-kwm-local-wildcard.yaml
