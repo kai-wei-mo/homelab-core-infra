@@ -74853,6 +74853,10 @@ spec:
                 name: prometheus-kube-prometheus-prometheus
                 port:
                   number: 9090
+  tls:
+    - hosts:
+      - prometheus.kwm.local
+      secretName: kwm-local-wildcard
 ---
 # Source: kube-prometheus-stack/templates/prometheus-operator/admission-webhooks/mutatingWebhookConfiguration.yaml
 apiVersion: admissionregistration.k8s.io/v1

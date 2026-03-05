@@ -36,9 +36,9 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: jellyfin-chaewon-tls
+    - secretName: kwm-local-wildcard
       hosts:
-        - jellyfin.chaewon.io
+        - jellyfin.kwm.local
 
 networkPolicy:
   enabled: false

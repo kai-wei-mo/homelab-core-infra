@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: healthcheck
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
 spec:
   ingressClassName: traefik
   rules:
@@ -17,3 +17,18 @@ spec:
                 name: healthcheck
                 port:
                   number: 80
+    - host: health.kwm.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: healthcheck
+                port:
+                  number: 80
+
+  tls:
+    - secretName: kwm-local-wildcard
+      hosts:
+        - health.kwm.local
