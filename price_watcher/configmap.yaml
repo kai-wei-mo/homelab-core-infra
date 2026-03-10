@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: price-watcher
+data:
+  SYMBOLS: "aa aapl amzn aqn googl meta net nflx nvda panw pypl qqq rblx sbux shop t vdy vfv wcp xyz"
+  REFRESH_SECONDS: "5"
