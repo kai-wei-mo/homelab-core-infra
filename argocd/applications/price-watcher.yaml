@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: price-watcher
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kai-wei-mo/homelab-core-infra.git
+    targetRevision: main
+    path: price_watcher
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: market-data
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
