@@ -1,0 +1,59 @@
+controllers:
+  main:
+    containers:
+      main:
+        image:
+          tag: v2.6.3
+        env:
+          DB_HOSTNAME: immich-database-rw.immich.svc.cluster.local
+          DB_PORT: "5432"
+          DB_DATABASE_NAME: immich
+          DB_USERNAME:
+            valueFrom:
+              secretKeyRef:
+                name: immich-database-owner-secret
+                key: username
+          DB_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: immich-database-owner-secret
+                key: password
+
+immich:
+  persistence:
+    library:
+      existingClaim: immich-library
+
+valkey:
+  enabled: true
+  persistence:
+    data:
+      type: persistentVolumeClaim
+      accessMode: ReadWriteOnce
+      size: 1Gi
+
+server:
+  ingress:
+    main:
+      enabled: true
+      className: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      hosts:
+        - host: immich.kwm.local
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                identifier: main
+        - host: immich.chaewon.io
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                identifier: main
+      tls:
+        - secretName: kwm-local-wildcard
+          hosts:
+            - immich.kwm.local
