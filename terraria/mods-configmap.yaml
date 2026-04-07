@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terraria-mods
+data:
+  enabled.json: |
+    [
+        "InfernumMode",
+        "SerousCommonLib",
+        "MagicStorage",
+        "SubworldLibrary",
+        "CalamityMod",
+        "CatalystMod",
+        "WMITF",
+        "OreExcavator",
+        "BossChecklist",
+        "RecipeBrowser",
+        "EfficientNohits",
+        "GravityDontFlipScreen",
+        "CnI",
+        "IMPPRO",
+        "Lights",
+        "CalamityModMusic",
+        "SmarterCursor",
+        "Consolaria",
+        "AutoReroll",
+        "Luminance",
+        "Census",
+        "RevengeancePlus",
+        "SOTS",
+        "InfernumSOTSSanctuaryAdjuster",
+        "ThoriumMod",
+        "InfernalEclipseAPI",
+        "MBStats",
+        "MultiplayerSpectator",
+        "OmniSwing",
+        "PrismaAlchemy",
+        "QoLCompendium",
+        "SharedMap",
+        "ThrowerUnification"
+      ]
+  install.txt: |
+    2669644269
+    2824688266
+    2824688072
+    2838015851
+    2785100219
+    3222493606
+    3459129920
+    2793971101
+    2670628346
+    2908170107
+    2563309347
+    2565639705
+    2619954303
+    2877850919
+    2563851005

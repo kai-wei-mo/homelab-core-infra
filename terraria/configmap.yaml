@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terraria-serverconfig
+data:
+  # tModLoader uses this config for non-interactive startup.
+  serverconfig.txt: |
+    world=/home/tml/.local/share/Terraria/tModLoader/Worlds/homelab.wld
+    autocreate=2
+    worldname=homelab
+    difficulty=1
+    maxplayers=8
+    port=7777
+    secure=1
+    upnp=0
+    motd=homelab tModLoader server
+    language=en-US
