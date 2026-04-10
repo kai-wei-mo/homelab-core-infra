@@ -1,0 +1,62 @@
+image:
+  repository: ghcr.io/home-operations/qbittorrent
+  pullPolicy: IfNotPresent
+
+# ghcr.io/home-operations/qbittorrent defaults to USER nobody; hostPath is often root-owned.
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  fsGroup: 0
+
+securityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  runAsNonRoot: false
+
+persistence:
+  config:
+    enabled: true
+    type: hostPath
+    hostPath: /mnt/seagate/jellyfin/.qbittorrent
+    mountPath: /config
+    hostPathType: DirectoryOrCreate
+
+  media:
+    enabled: false
+
+  downloads:
+    enabled: false
+
+  movies:
+    enabled: true
+    type: hostPath
+    hostPath: /mnt/seagate/jellyfin/movies
+    mountPath: /movies
+    hostPathType: Directory
+
+  tv:
+    enabled: true
+    type: hostPath
+    hostPath: /mnt/seagate/jellyfin/tv
+    mountPath: /tv
+    hostPathType: Directory
+
+ingress:
+  main:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    hosts:
+      - host: qbittorrent.kwm.local
+        paths:
+          - path: /
+            pathType: Prefix
+      - host: qbittorrent.chaewon.io
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: kwm-local-wildcard
+        hosts:
+          - qbittorrent.kwm.local
