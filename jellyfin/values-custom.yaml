@@ -16,7 +16,7 @@ persistence:
   media:
     enabled: true
     type: hostPath
-    hostPath: /srv/samba/plex
+    hostPath: /mnt/seagate/jellyfin
 
   cache:
     enabled: false
