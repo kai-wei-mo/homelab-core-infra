@@ -114,7 +114,7 @@ spec:
             claimName: jellyfin-config
         - name: media
           hostPath:
-            path: /srv/samba/plex
+            path: /mnt/seagate/jellyfin
             type: Directory
 ---
 # Source: jellyfin/templates/ingress.yaml
