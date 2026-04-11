@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gluetun
+  labels:
+    app: gluetun
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gluetun
+  template:
+    metadata:
+      labels:
+        app: gluetun
+    spec:
+      securityContext:
+        fsGroup: 0
+      containers:
+        - name: gluetun
+          image: docker.io/qmcgaw/gluetun:v3.41.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: TZ
+              value: UTC
+            - name: VPN_SERVICE_PROVIDER
+              value: protonvpn
+            - name: VPN_TYPE
+              value: wireguard
+            - name: SERVER_COUNTRIES
+              value: United States
+            - name: SERVER_CITIES
+              value: Chicago
+            - name: VPN_PORT_FORWARDING
+              value: "on"
+            - name: VPN_PORT_FORWARDING_PROVIDER
+              value: protonvpn
+            - name: HTTPPROXY
+              value: "on"
+            - name: FIREWALL_INPUT_PORTS
+              value: "8888"
+            - name: WIREGUARD_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: protonvpn-gluetun
+                  key: WIREGUARD_PRIVATE_KEY
+          volumeMounts:
+            - name: tun
+              mountPath: /dev/net/tun
+          ports:
+            - name: http-proxy
+              containerPort: 8888
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http-proxy
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
