@@ -5,7 +5,7 @@ namespace: networking
 
 resources:
   - install.yaml
-
+  - namespace.yaml
   - sealed-cloudflare-tunnel-remote-chaewon-io.yaml
 
 patches:

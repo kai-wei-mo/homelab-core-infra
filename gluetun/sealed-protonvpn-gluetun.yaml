@@ -1,0 +1,13 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: protonvpn-gluetun
+  namespace: networking
+spec:
+  encryptedData:
+    WIREGUARD_PRIVATE_KEY: AgCDCi43O9owbLpoeXmuUIE7MN3CRPydAttZBVJe3GL2GFwQShLofb2iO8+chsGZtAU3g0x7N0osLGPiY1an036Q93v4m0i6v8SNlcwnuxoh1XRMCLXVZMl2wsWbUu37pQcbDXjU8Cm26wHYG/tq0MGTigjuvjLaMkFPTaB1bjYDdC932BsyhamBbHiTA3MVY5gBwvP2vqSeLYc7LNjPCW4aPIPha5paqD6CCSddNi9qAb7EoGwcL2E/7Q5/B7YlOUW4vl3gElbfxhm1Y6oXOKk+moxHIuUNtq57BA4HB/B+/jqEqVThgFgq9jXzimbqSbtPupk6/oa9l22csiStj6hG4X6CSu5KmnBcjoqEjWUYGsBkZvBdX+68C3+ls41A2rc5vTb3d/pafzHuX2ieuJw/yMe5fBuedf+dph1mSe/3douFLuyU8OKwoFTAQa+7B4rt7K3s0FSt83xjbKpSjVEKTBMagoB6TOClpi8LjjKorQpsa2n6fgL1FN9UtaHk3tJejoh/OUs7nrRmar+ND7szLGHkfET6kn76EnMa+ZA3Dte6D9Zx0UIXuEhBy74opPezHsPQn5iE5NSvbNsEqftQZhyreNyZfeCwS4JjFWgJbo/UO4w3DYwQC+wsm8KjXwIz5xuS6lXmL4d9bpME4GfitTvFgMMng3TfNT0RsATF/+Y6Q2exqIp07Mg+K3WCnU/6WVbIuxAwqpi+zCziU60ze+lSzGJeQUPX7soQN+f00taNXKamDSP/iPbXtg==
+  template:
+    metadata:
+      name: protonvpn-gluetun
+      namespace: networking

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gluetun
+  labels:
+    app: gluetun
+spec:
+  type: ClusterIP
+  selector:
+    app: gluetun
+  ports:
+    - name: http-proxy
+      port: 8888
+      targetPort: http-proxy
+      protocol: TCP
