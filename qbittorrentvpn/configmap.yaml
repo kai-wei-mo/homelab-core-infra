@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qbittorrentvpn
+  labels:
+    app.kubernetes.io/name: qbittorrentvpn
+data:
+  # Comma-separated CIDRs allowed to reach the WebUI and bypass VPN kill switch for local routes.
+  # Include your LAN and cluster pod/service ranges (adjust for your CNI).
+  LAN_NETWORK: "192.168.0.0/16,10.0.0.0/8"
+  NAME_SERVERS: "1.1.1.1,1.0.0.1"

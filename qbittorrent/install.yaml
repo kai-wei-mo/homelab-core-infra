@@ -68,7 +68,8 @@ spec:
         fsGroup: 0
         runAsGroup: 0
         runAsUser: 0
-      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       enableServiceLinks: true
       containers:
         - name: qbittorrent

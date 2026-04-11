@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qbittorrentvpn
+  labels:
+    app.kubernetes.io/name: qbittorrentvpn
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: qbittorrentvpn
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+    - name: bt-tcp
+      port: 8999
+      targetPort: bt-tcp
+      protocol: TCP
+    - name: bt-udp
+      port: 8999
+      targetPort: bt-udp
+      protocol: UDP
