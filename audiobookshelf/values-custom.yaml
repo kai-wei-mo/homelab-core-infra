@@ -1,0 +1,42 @@
+image:
+  repository: ghcr.io/advplyr/audiobookshelf
+  pullPolicy: IfNotPresent
+
+env:
+  TZ: America/Chicago
+  CONFIG_PATH: /data/config
+  METADATA_PATH: /data/metadata
+
+service:
+  main:
+    type: ClusterIP
+    ports:
+      http:
+        port: 80
+
+ingress:
+  main:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    hosts:
+      - host: audiobookshelf.kwm.local
+        paths:
+          - path: /
+            pathType: Prefix
+      - host: audiobookshelf.chaewon.io
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: kwm-local-wildcard
+        hosts:
+          - audiobookshelf.kwm.local
+
+persistence:
+  data:
+    enabled: true
+    type: hostPath
+    hostPath: /mnt/seagate/audiobookshelf
+    mountPath: /data
