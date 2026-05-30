@@ -6,6 +6,6 @@ namespace: immich
 resources:
   - library-pv.yaml
   - library-pvc.yaml
-  - db-owner-secret.yaml
+  - sealed-db-owner-secret.yaml
   - postgres-cluster.yaml
   - install.yaml
