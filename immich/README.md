@@ -6,7 +6,30 @@
 
 - **CloudNative-PG** Application synced first ([`argocd/applications/cloudnative-pg.yaml`](../argocd/applications/cloudnative-pg.yaml)); this Argo CD Application uses sync wave `1` so the operator is already on the cluster.
 - **TLS**: Ingress references `kwm-local-wildcard` for `immich.kwm.local`. Reflector is configured to mirror that secret into new namespaces (including `immich`).
-- **Database password**: [`db-owner-secret.yaml`](db-owner-secret.yaml) contains a generated password used for both CNPG bootstrap and Immich `DB_*` env vars. Rotate it (and re-seal with [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) if you prefer not to store cleartext in Git), then reconcile the `Cluster` only if you change it before first bootstrap.
+- **Database password**: [`sealed-db-owner-secret.yaml`](sealed-db-owner-secret.yaml) (Sealed Secret) supplies credentials for CNPG bootstrap and Immich `DB_*` env vars. To rotate after bootstrap, re-seal with [kubeseal](https://github.com/bitnami-labs/sealed-secrets), sync, `ALTER USER immich WITH PASSWORD '…'` in Postgres, then restart Immich workloads. Changing the secret alone only affects a not-yet-bootstrapped `Cluster`.
+
+### Rotate after a leak (existing cluster)
+
+1. Generate and seal a new secret (do not commit cleartext):
+
+```bash
+kubectl create secret generic immich-database-owner-secret \
+  --namespace=immich \
+  --from-literal=username=immich \
+  --from-literal=password="$(openssl rand -hex 24)" \
+  --dry-run=client -o yaml | kubeseal -o yaml > sealed-db-owner-secret.yaml
+```
+
+2. Commit, push, and let Argo CD sync (removes the plain `Secret`, applies `SealedSecret`).
+3. After sync, update Postgres and restart Immich:
+
+```bash
+NEW=$(kubectl get secret immich-database-owner-secret -n immich -o jsonpath='{.data.password}' | base64 -d)
+kubectl exec -n immich immich-database-1 -- psql -U postgres -c "ALTER USER immich WITH PASSWORD '$NEW';"
+kubectl rollout restart deployment/immich-server -n immich
+```
+
+If the SealedSecret reports the Secret already exists, delete the old Argo-managed `Secret` once after sync so the controller can recreate it.
 
 ## Regenerate `install.yaml`
 
