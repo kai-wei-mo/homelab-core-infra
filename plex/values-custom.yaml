@@ -1,6 +1,6 @@
 env:
   TZ: America/Chicago
-  ADVERTISE_IP: "http://plex.kwm.local,https://plex.chaewon.io"
+  ADVERTISE_IP: "http://plex.home.chaewon.io,https://plex.chaewon.io"
 
 envFrom:
   - secretRef:
@@ -18,7 +18,7 @@ ingress:
     enabled: true
     ingressClassName: traefik
     hosts:
-      - host: plex.kwm.local
+      - host: plex.home.chaewon.io
         paths:
           - path: /
             pathType: Prefix
@@ -27,9 +27,9 @@ ingress:
           - path: /
             pathType: Prefix
     tls:
-      - secretName: kwm-local-wildcard
+      - secretName: home-chaewon-io-wildcard
         hosts:
-          - plex.kwm.local
+          - plex.home.chaewon.io
 
 persistence:
   config:

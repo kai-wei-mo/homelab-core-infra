@@ -17,7 +17,7 @@ spec:
                 name: healthcheck
                 port:
                   number: 80
-    - host: health.kwm.local
+    - host: health.home.chaewon.io
       http:
         paths:
           - path: /
@@ -29,6 +29,6 @@ spec:
                   number: 80
 
   tls:
-    - secretName: kwm-local-wildcard
+    - secretName: home-chaewon-io-wildcard
       hosts:
-        - health.kwm.local
+        - health.home.chaewon.io

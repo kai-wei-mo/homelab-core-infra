@@ -27,7 +27,7 @@ ingress:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
   hosts:
-    - host: jellyfin.kwm.local
+    - host: jellyfin.home.chaewon.io
       paths:
         - path: /
           pathType: Prefix
@@ -36,9 +36,9 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: kwm-local-wildcard
+    - secretName: home-chaewon-io-wildcard
       hosts:
-        - jellyfin.kwm.local
+        - jellyfin.home.chaewon.io
 
 networkPolicy:
   enabled: false

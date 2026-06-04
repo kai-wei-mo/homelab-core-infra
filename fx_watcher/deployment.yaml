@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fx-watcher
+  labels:
+    app: fx-watcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fx-watcher
+  template:
+    metadata:
+      labels:
+        app: fx-watcher
+    spec:
+      containers:
+        - name: fx-watcher
+          image: kaiweimo/fx_watcher:0.1.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: fx-watcher
+          env:
+            - name: WISE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: wise-token
+                  key: token
+          ports:
+            - name: http
+              containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi

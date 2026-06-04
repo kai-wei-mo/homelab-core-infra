@@ -419,10 +419,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "immich.kwm.local"
-      secretName: "kwm-local-wildcard"
+        - "immich.home.chaewon.io"
+      secretName: "home-chaewon-io-wildcard"
   rules:
-    - host: "immich.kwm.local"
+    - host: "immich.home.chaewon.io"
       http:
         paths:
           - path: "/"

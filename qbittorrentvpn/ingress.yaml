@@ -10,20 +10,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "qbittorrentvpn.kwm.local"
-      secretName: "kwm-local-wildcard"
+        - "qbittorrentvpn.home.chaewon.io"
+      secretName: "home-chaewon-io-wildcard"
   rules:
-    - host: qbittorrentvpn.kwm.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: qbittorrentvpn
-                port:
-                  number: 8080
-    - host: qbittorrentvpn.chaewon.io
+    - host: qbittorrentvpn.home.chaewon.io
       http:
         paths:
           - path: /

@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fx-watcher
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: fx-watcher.home.chaewon.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fx-watcher
+                port:
+                  number: 8000
+  tls:
+    - secretName: home-chaewon-io-wildcard
+      hosts:
+        - fx-watcher.home.chaewon.io

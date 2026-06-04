@@ -1,0 +1,199 @@
+---
+# Source: alertmanager/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alertmanager
+  labels:
+    helm.sh/chart: alertmanager-1.33.1
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+    app.kubernetes.io/version: "v0.31.1"
+    app.kubernetes.io/managed-by: Helm
+  namespace: monitoring
+automountServiceAccountToken: true
+---
+# Source: alertmanager/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager
+  labels:
+    helm.sh/chart: alertmanager-1.33.1
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+    app.kubernetes.io/version: "v0.31.1"
+    app.kubernetes.io/managed-by: Helm
+  namespace: monitoring
+data:
+  alertmanager.yml: |
+    global: {}
+    receivers:
+    - name: default-receiver
+    route:
+      group_interval: 5m
+      group_wait: 10s
+      receiver: default-receiver
+      repeat_interval: 3h
+    templates:
+    - /etc/alertmanager/*.tmpl
+---
+# Source: alertmanager/templates/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  labels:
+    helm.sh/chart: alertmanager-1.33.1
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+    app.kubernetes.io/version: "v0.31.1"
+    app.kubernetes.io/managed-by: Helm
+  namespace: monitoring
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9093
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+---
+# Source: alertmanager/templates/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager-headless
+  labels:
+    helm.sh/chart: alertmanager-1.33.1
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+    app.kubernetes.io/version: "v0.31.1"
+    app.kubernetes.io/managed-by: Helm
+  namespace: monitoring
+spec:
+  clusterIP: None
+  ports:
+    - port: 9093
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+---
+# Source: alertmanager/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: alertmanager
+  labels:
+    helm.sh/chart: alertmanager-1.33.1
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+    app.kubernetes.io/version: "v0.31.1"
+    app.kubernetes.io/managed-by: Helm
+  namespace: monitoring
+spec:
+  replicas: 1
+  minReadySeconds: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: alertmanager
+      app.kubernetes.io/instance: alertmanager
+  serviceName: alertmanager-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: alertmanager
+        app.kubernetes.io/instance: alertmanager
+      annotations:
+        checksum/config: dd52ff3b9d9e299cd0c6fbaea06df8c38bff2a891dda9c178254b11993a8a854
+    spec:
+      automountServiceAccountToken: true
+      serviceAccountName: alertmanager
+      securityContext:
+        fsGroup: 65534
+      containers:
+        - name: alertmanager
+          securityContext:
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+          image: "quay.io/prometheus/alertmanager:v0.31.1"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+          args:
+            - --storage.path=/alertmanager
+            - --config.file=/etc/alertmanager/alertmanager.yml
+          ports:
+            - name: http
+              containerPort: 9093
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alertmanager
+            - name: storage
+              mountPath: /alertmanager
+      volumes:
+        - name: config
+          configMap:
+            name: alertmanager
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Mi
+---
+# Source: alertmanager/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: alertmanager
+  labels:
+    helm.sh/chart: alertmanager-1.33.1
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/instance: alertmanager
+    app.kubernetes.io/version: "v0.31.1"
+    app.kubernetes.io/managed-by: Helm
+  namespace: monitoring
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "alertmanager.home.chaewon.io"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: alertmanager
+                port:
+                  number: 9093

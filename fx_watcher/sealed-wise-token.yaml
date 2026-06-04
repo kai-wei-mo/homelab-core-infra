@@ -1,0 +1,14 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: wise-token
+  namespace: market-data
+spec:
+  encryptedData:
+    token: AgA4oeiNhsIQTUxW9wWnSfkA1Izd9dialttBYzUz2urY1upI6bJ/2Zw08csK4LrqFKuS/5smGmY9FmVZVF/Z8f7c14aLZvEEszSMMtCHOGm9i0J4zq97JIG2Nf0rrZwcEUi9cpJRAA3YnlIZBy9rSdpsjbc8FOj5elYO57WV5qdFSc02PWD+WFLrFUiTJao21+pfKP07pp3cLtjWC6G8ZkuUKWoN4a1wRWwth4atBPAE+9mA3SSfEzlM6Ewln4i+X7WkLfFSNw4TpMjIXDoGLFiSr/+WCx+ra1fmhRDEPdSuST/v7E+4+N8lv5qETjOWdAVTVLkP/6GEcISKSP0x36b7F8iyU3HVtvGu1y81WNIaQBQ6GvWzVF/XRBuJinXNtHB3+2NkV9rJJaTTOmghWik8vuUzjGBEXmwXWJ1y6LN/n8KWhjp3wllwbSV7G+/W8MgZ1Oz0mvwBvmqOAixZuIf5zLU7jWKv8m5v5YbsgLwXj0JHJzGCvDyIAsITBBdf7xK8ehcSIg2BO2cgqa6fAWAlxsMaRpOWOniOY/8xt75gI5HW8TClw02iPbX3nTEj75+RZWAzgnl6dLVTEd91u+bPdLKXjD4Fte276tE5ztUIyMO7BBe1e/DASnlPtmJsYPOm9xnsZApSgtykTliS+RNyrlDDE2cj4s/rEQvBk/6G4Bh/NMXFaGsGms4FUtU6SqNzElfh9OHRvpzaGDj3/WK7ZxSOOrlvd7/Fgz9cV+Wu7WzBoSY=
+  template:
+    metadata:
+      name: wise-token
+      namespace: market-data
+    type: Opaque

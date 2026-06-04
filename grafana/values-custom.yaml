@@ -12,11 +12,11 @@ ingress:
   path: /
   pathType: Prefix
   hosts:
-    - grafana.kwm.local
+    - grafana.home.chaewon.io
   tls:
-    - secretName: kwm-local-wildcard
+    - secretName: home-chaewon-io-wildcard
       hosts:
-        - grafana.kwm.local
+        - grafana.home.chaewon.io
 
 datasources:
   datasources.yaml:

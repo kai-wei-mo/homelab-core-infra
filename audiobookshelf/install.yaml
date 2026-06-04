@@ -114,20 +114,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "audiobookshelf.kwm.local"
-      secretName: "kwm-local-wildcard"
+        - "audiobookshelf.home.chaewon.io"
+      secretName: "home-chaewon-io-wildcard"
   rules:
-    - host: "audiobookshelf.kwm.local"
-      http:
-        paths:
-          - path: "/"
-            pathType: Prefix
-            backend:
-              service:
-                name: audiobookshelf
-                port:
-                  number: 80
-    - host: "audiobookshelf.chaewon.io"
+    - host: "audiobookshelf.home.chaewon.io"
       http:
         paths:
           - path: "/"

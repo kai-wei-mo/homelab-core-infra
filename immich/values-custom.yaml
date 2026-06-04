@@ -41,7 +41,7 @@ server:
         traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
         nginx.ingress.kubernetes.io/proxy-body-size: "0"
       hosts:
-        - host: immich.kwm.local
+        - host: immich.home.chaewon.io
           paths:
             - path: /
               pathType: Prefix
@@ -54,6 +54,6 @@ server:
               service:
                 identifier: main
       tls:
-        - secretName: kwm-local-wildcard
+        - secretName: home-chaewon-io-wildcard
           hosts:
-            - immich.kwm.local
+            - immich.home.chaewon.io

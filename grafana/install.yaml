@@ -57,7 +57,7 @@ data:
     plugins = /var/lib/grafana/plugins
     provisioning = /etc/grafana/provisioning
     [server]
-    domain = grafana.kwm.local
+    domain = grafana.home.chaewon.io
   datasources.yaml: |
     apiVersion: 1
     datasources:
@@ -181,7 +181,7 @@ spec:
         app.kubernetes.io/instance: grafana
         app.kubernetes.io/version: "12.3.0"
       annotations:
-        checksum/config: bb497a71136cf05ab9408ffcc853a01861a28ebe5260912162a3cc1f7baf8898
+        checksum/config: d9f831d7908878455495191e4e95e2e4bd802f71a9d7b0d95678ef81b6bdd603
         checksum/sc-dashboard-provider-config: e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24
         checksum/secret: bed677784356b2af7fb0d87455db21f077853059b594101a4f6532bfbd962a7f
         kubectl.kubernetes.io/default-container: grafana
@@ -287,10 +287,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-      - grafana.kwm.local
-      secretName: kwm-local-wildcard
+      - grafana.home.chaewon.io
+      secretName: home-chaewon-io-wildcard
   rules:
-    - host: "grafana.kwm.local"
+    - host: "grafana.home.chaewon.io"
       http:
         paths:
           - path: /
