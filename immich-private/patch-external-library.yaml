@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-private-server
+  namespace: immich-private
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          volumeMounts:
+            - mountPath: /mnt/seagate/immich2
+              name: external-library
+              readOnly: true
+      volumes:
+        - name: external-library
+          persistentVolumeClaim:
+            claimName: immich-private-external-library
+            readOnly: true

@@ -1,0 +1,57 @@
+controllers:
+  main:
+    containers:
+      main:
+        image:
+          tag: v2.7.5
+        env:
+          DB_HOSTNAME: immich-private-database-rw.immich-private.svc.cluster.local
+          DB_PORT: "5432"
+          DB_DATABASE_NAME: immich-private
+          DB_USERNAME:
+            valueFrom:
+              secretKeyRef:
+                name: immich-private-database-owner-secret
+                key: username
+          DB_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: immich-private-database-owner-secret
+                key: password
+
+immich:
+  persistence:
+    library:
+      existingClaim: immich-private-library
+    # NOTE: the read-only external library is NOT defined here. The upstream
+    # Immich chart only renders the `library` volume and drops extra entries,
+    # so it is injected by patch-external-library.yaml via kustomize instead
+    # (mounted read-only at /mnt/seagate/immich2 on immich-private-server).
+
+valkey:
+  enabled: true
+  persistence:
+    data:
+      type: persistentVolumeClaim
+      accessMode: ReadWriteOnce
+      size: 1Gi
+
+server:
+  ingress:
+    main:
+      enabled: true
+      className: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      hosts:
+        - host: immich-private.home.chaewon.io
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                identifier: main
+      tls:
+        - secretName: home-chaewon-io-wildcard
+          hosts:
+            - immich-private.home.chaewon.io
