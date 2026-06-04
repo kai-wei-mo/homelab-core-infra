@@ -1,34 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: healthcheck
+  name: fx-watcher
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
 spec:
   ingressClassName: traefik
   rules:
-    - host: health.chaewon.io
+    - host: fx-watcher.home.chaewon.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: healthcheck
+                name: fx-watcher
                 port:
-                  number: 80
-    - host: health.home.chaewon.io
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: healthcheck
-                port:
-                  number: 80
-
+                  number: 8000
   tls:
     - secretName: home-chaewon-io-wildcard
       hosts:
-        - health.home.chaewon.io
+        - fx-watcher.home.chaewon.io

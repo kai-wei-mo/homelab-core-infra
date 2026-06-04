@@ -74843,7 +74843,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: "prometheus.kwm.local"
+    - host: "prometheus.home.chaewon.io"
       http:
         paths:
           - path: /
@@ -74855,8 +74855,8 @@ spec:
                   number: 9090
   tls:
     - hosts:
-      - prometheus.kwm.local
-      secretName: kwm-local-wildcard
+      - prometheus.home.chaewon.io
+      secretName: home-chaewon-io-wildcard
 ---
 # Source: kube-prometheus-stack/templates/prometheus-operator/admission-webhooks/mutatingWebhookConfiguration.yaml
 apiVersion: admissionregistration.k8s.io/v1
@@ -74981,7 +74981,7 @@ spec:
   image: "quay.io/prometheus/prometheus:v3.8.1"
   imagePullPolicy: "IfNotPresent"
   version: v3.8.1
-  externalUrl: "http://prometheus.kwm.local/"
+  externalUrl: "http://prometheus.home.chaewon.io/"
   paused: false
   replicas: 1
   shards: 1

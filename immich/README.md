@@ -5,7 +5,7 @@
 ## Prerequisites
 
 - **CloudNative-PG** Application synced first ([`argocd/applications/cloudnative-pg.yaml`](../argocd/applications/cloudnative-pg.yaml)); this Argo CD Application uses sync wave `1` so the operator is already on the cluster.
-- **TLS**: Ingress references `kwm-local-wildcard` for `immich.kwm.local`. Reflector is configured to mirror that secret into new namespaces (including `immich`).
+- **TLS**: Ingress references `kwm-local-wildcard` for `immich.home.chaewon.io`. Reflector is configured to mirror that secret into new namespaces (including `immich`).
 - **Database password**: [`sealed-db-owner-secret.yaml`](sealed-db-owner-secret.yaml) (Sealed Secret) supplies credentials for CNPG bootstrap and Immich `DB_*` env vars. To rotate after bootstrap, re-seal with [kubeseal](https://github.com/bitnami-labs/sealed-secrets), sync, `ALTER USER immich WITH PASSWORD '…'` in Postgres, then restart Immich workloads. Changing the secret alone only affects a not-yet-bootstrapped `Cluster`.
 
 ### Rotate after a leak (existing cluster)

@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: price-watcher.kwm.local
+    - host: price-watcher.home.chaewon.io
       http:
         paths:
           - path: /
@@ -18,6 +18,6 @@ spec:
                 port:
                   number: 9100
   tls:
-    - secretName: kwm-local-wildcard
+    - secretName: home-chaewon-io-wildcard
       hosts:
-        - price-watcher.kwm.local
+        - price-watcher.home.chaewon.io

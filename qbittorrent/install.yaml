@@ -68,8 +68,7 @@ spec:
         fsGroup: 0
         runAsGroup: 0
         runAsUser: 0
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
+      dnsPolicy: ClusterFirst
       enableServiceLinks: true
       containers:
         - name: qbittorrent
@@ -145,20 +144,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "qbittorrent.kwm.local"
-      secretName: "kwm-local-wildcard"
+        - "qbittorrent.home.chaewon.io"
+      secretName: "home-chaewon-io-wildcard"
   rules:
-    - host: "qbittorrent.kwm.local"
-      http:
-        paths:
-          - path: "/"
-            pathType: Prefix
-            backend:
-              service:
-                name: qbittorrent
-                port:
-                  number: 8080
-    - host: "qbittorrent.chaewon.io"
+    - host: "qbittorrent.home.chaewon.io"
       http:
         paths:
           - path: "/"

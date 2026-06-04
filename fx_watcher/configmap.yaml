@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fx-watcher
+data:
+  WISE_API: "https://api.sandbox.transferwise.tech/v1/rates"
+  FETCH_INTERVAL_SECONDS: "1800"

@@ -1,0 +1,42 @@
+# AlertmanagerConfig for Wise USD/CAD exchange rate alerts.
+# Routes WiseUsdCadRateHigh alerts to Discord when rate > 1.37.
+#
+# Prerequisites:
+# 1. Create a Secret with your Discord webhook URL:
+#    kubectl create secret generic wise-discord-webhook -n monitoring \
+#      --from-literal=url='https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_TOKEN'
+#
+# 2. For AlertmanagerConfig to take effect, Prometheus Operator must manage Alertmanager.
+#    Enable alertmanager in kube-prometheus-stack (prometheus values-custom.yaml) or
+#    ensure your Alertmanager CR has alertmanagerConfigSelector that matches this config.
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: wise-exchange-rate
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  route:
+    receiver: discord-wise
+    groupBy: ['alertname']
+    groupWait: 10s
+    groupInterval: 5m
+    repeatInterval: 3h
+    matchers:
+      - name: alertname
+        value: WiseUsdCadRateHigh
+  receivers:
+    - name: discord-wise
+      discordConfigs:
+        - apiURL:
+            name: wise-discord-webhook
+            key: url
+          sendResolved: true
+          content: |
+            {{ range .Alerts -}}
+            **{{ .Labels.alertname }}** {{ .Status }}
+            {{ .Annotations.summary }}
+            {{ .Annotations.description }}
+            {{ end -}}

@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: wise-exchange-rate
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: wise-exchange-rate
+      rules:
+        - alert: WiseUsdCadRateHigh
+          expr: wise_usd_cad_exchange_rate > 1.37
+          for: 5m
+          labels:
+            severity: info
+          annotations:
+            summary: Wise USD/CAD rate above 1.37
+            description: "Current rate {{ $value }} exceeds threshold. Consider converting USD to CAD."

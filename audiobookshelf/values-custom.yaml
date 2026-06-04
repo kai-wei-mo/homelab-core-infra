@@ -21,18 +21,14 @@ ingress:
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     hosts:
-      - host: audiobookshelf.kwm.local
-        paths:
-          - path: /
-            pathType: Prefix
-      - host: audiobookshelf.chaewon.io
+      - host: audiobookshelf.home.chaewon.io
         paths:
           - path: /
             pathType: Prefix
     tls:
-      - secretName: kwm-local-wildcard
+      - secretName: home-chaewon-io-wildcard
         hosts:
-          - audiobookshelf.kwm.local
+          - audiobookshelf.home.chaewon.io
 
 persistence:
   data:

@@ -47,15 +47,11 @@ ingress:
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     hosts:
-      - host: qbittorrent.kwm.local
-        paths:
-          - path: /
-            pathType: Prefix
-      - host: qbittorrent.chaewon.io
+      - host: qbittorrent.home.chaewon.io
         paths:
           - path: /
             pathType: Prefix
     tls:
-      - secretName: kwm-local-wildcard
+      - secretName: home-chaewon-io-wildcard
         hosts:
-          - qbittorrent.kwm.local
+          - qbittorrent.home.chaewon.io

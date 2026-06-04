@@ -7,14 +7,14 @@ prometheus:
     enabled: true
     ingressClassName: traefik
     hosts:
-      - prometheus.kwm.local
+      - prometheus.home.chaewon.io
     paths:
       - /
     pathType: Prefix
     tls:
-      - secretName: kwm-local-wildcard
+      - secretName: home-chaewon-io-wildcard
         hosts:
-          - prometheus.kwm.local
+          - prometheus.home.chaewon.io
 
 grafana:
   enabled: false
