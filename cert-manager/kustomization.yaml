@@ -5,3 +5,7 @@ namespace: cert-manager
 
 resources:
   - install.yaml
+
+  - sealed-cloudflare-api-token.yaml
+  - cluster-issuer.yaml
+  - certificate.yaml
