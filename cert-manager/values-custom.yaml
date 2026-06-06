@@ -1,0 +1,23 @@
+crds:
+  enabled: true
+
+# Keep leader-election Leases (and their RBAC) in the cert-manager namespace.
+# The default is kube-system, but our kustomize namespace transformer rewrites
+# the chart's kube-system RBAC into cert-manager, which breaks leader election.
+global:
+  leaderElection:
+    namespace: cert-manager
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+# Post-install smoke-check Job; immutable Jobs fight with Argo CD's
+# apply/prune loop, and Argo's own health checks cover the same ground.
+startupapicheck:
+  enabled: false
