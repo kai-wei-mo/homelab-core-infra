@@ -3,5 +3,12 @@ kind: ConfigMap
 metadata:
   name: fx-watcher
 data:
-  WISE_API: "https://api.sandbox.transferwise.tech/v1/rates"
-  FETCH_INTERVAL_SECONDS: "1800"
+  WISE_API: "https://api.wise-sandbox.com/v1/rates"
+  MARKET_TZ: "America/Toronto"
+  POLL_CRON: "0 13 * * *"
+  POLL_ON_START: "true"
+  IGNORE_WEEKEND: "true"
+  RATE_THRESHOLD: "1.42"
+  HISTORY_DAYS: "30"
+  HISTORY_GROUP: "day"
+  SEND_CHART: "true"

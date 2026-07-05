@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: fx-watcher
-          image: kaiweimo/fx_watcher:0.1.0
+          image: kaiweimo/fx_watcher:0.1.1
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -27,6 +27,16 @@ spec:
                 secretKeyRef:
                   name: wise-token
                   key: token
+            - name: DISCORD_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: discord
+                  key: webhook-url
+            - name: DISCORD_PING_USER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: discord
+                  key: ping-user-id
           ports:
             - name: http
               containerPort: 8000
@@ -45,7 +55,7 @@ spec:
           resources:
             requests:
               cpu: 10m
-              memory: 32Mi
+              memory: 64Mi
             limits:
               cpu: 100m
-              memory: 64Mi
+              memory: 128Mi
