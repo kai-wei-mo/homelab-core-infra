@@ -1,0 +1,28 @@
+controller:
+  serviceType: ClusterIP
+
+  admin:
+    # createSecret must stay true so the chart mounts the secret as
+    # chart-admin-username/password for JCasC; existingSecret skips creating one.
+    createSecret: true
+    existingSecret: jenkins-admin
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    path: /
+    pathType: Prefix
+    hostName: jenkins.home.chaewon.io
+    tls:
+      - secretName: home-chaewon-io-wildcard
+        hosts:
+          - jenkins.home.chaewon.io
+
+agent:
+  enabled: true
+
+persistence:
+  enabled: true
+  size: 20Gi
