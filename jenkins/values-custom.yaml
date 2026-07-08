@@ -20,39 +20,40 @@ controller:
         hosts:
           - jenkins.home.chaewon.io
 
-  sidecars:
-    additionalSidecarContainers:
-      - name: tailscale
-        image: tailscale/tailscale:stable
-        env:
-          - name: TS_AUTHKEY
-            valueFrom:
-              secretKeyRef:
-                name: jenkins-tailscale
-                key: auth-key
-          # Persist node state across restarts (defaults to secret "tailscale").
-          - name: TS_KUBE_SECRET
-            value: jenkins-tailscale-state
-          - name: TS_HOSTNAME
-            value: jenkins-controller
-          - name: TS_EXTRA_ARGS
-            value: --accept-routes
-          - name: TS_USERSPACE
-            value: "false"
-          # Required for writing Pod Events (see rbac-tailscale.yaml).
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: POD_UID
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.uid
-        securityContext:
-          capabilities:
-            add:
-              - NET_ADMIN
-              - NET_RAW
+  # The k8s node is already on the tailnet with --accept-routes
+  # so pod egress to EC2 private IPs uses the host routes.
+  # This sidecar would only be needed if this were not the case.
+
+  # sidecars:
+  #   additionalSidecarContainers:
+  #     - name: tailscale
+  #       image: tailscale/tailscale:stable
+  #       env:
+  #         - name: TS_AUTHKEY
+  #           valueFrom:
+  #             secretKeyRef:
+  #               name: jenkins-tailscale
+  #               key: auth-key
+  #         - name: TS_KUBE_SECRET
+  #           value: jenkins-tailscale-state
+  #         - name: TS_HOSTNAME
+  #           value: jenkins-controller
+  #         - name: TS_EXTRA_ARGS
+  #           value: --accept-routes
+  #         - name: TS_USERSPACE
+  #           value: "false"
+  #         - name: POD_NAME
+  #           valueFrom:
+  #             fieldRef:
+  #               fieldPath: metadata.name
+  #         - name: POD_UID
+  #           valueFrom:
+  #             fieldRef:
+  #               fieldPath: metadata.uid
+  #       securityContext:
+  #         privileged: true
+  #         runAsUser: 0
+  #         runAsNonRoot: false
 
   additionalExistingSecrets:
     - name: jenkins-aws
@@ -139,7 +140,7 @@ controller:
                     yamlMergeStrategy: override
                     inheritYamlMergeStrategy: false
             - amazonEC2:
-                cloudName: "ec2-us-east-1"
+                name: "ec2-us-east-1"
                 credentialsId: "aws-ec2"
                 region: "us-east-1"
                 sshKeysCredentialsId: "ec2-ssh"
