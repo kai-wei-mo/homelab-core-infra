@@ -5,4 +5,9 @@ namespace: jenkins
 
 resources:
   - sealed-jenkins-admin.yaml
+  - sealed-jenkins-aws.yaml
+  - sealed-jenkins-ec2-ssh.yaml
+  - sealed-jenkins-tailscale.yaml
+  - rbac-tailscale.yaml
+
   - install.yaml
