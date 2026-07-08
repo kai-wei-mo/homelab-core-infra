@@ -142,7 +142,7 @@ data:
                 yamlMergeStrategy: override
                 inheritYamlMergeStrategy: false
         - amazonEC2:
-            cloudName: "ec2-us-east-1"
+            name: "ec2-us-east-1"
             credentialsId: "aws-ec2"
             region: "us-east-1"
             sshKeysCredentialsId: "ec2-ssh"
@@ -694,35 +694,6 @@ spec:
               mountPath: /var/jenkins_home
             - name: tmp-volume
               mountPath: /tmp
-        - env:
-          - name: TS_AUTHKEY
-            valueFrom:
-              secretKeyRef:
-                key: auth-key
-                name: jenkins-tailscale
-          - name: TS_KUBE_SECRET
-            value: jenkins-tailscale-state
-          - name: TS_HOSTNAME
-            value: jenkins-controller
-          - name: TS_EXTRA_ARGS
-            value: --accept-routes
-          - name: TS_USERSPACE
-            value: "false"
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: POD_UID
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.uid
-          image: tailscale/tailscale:stable
-          name: tailscale
-          securityContext:
-            capabilities:
-              add:
-              - NET_ADMIN
-              - NET_RAW
 
       volumes:
       - name: plugins
@@ -822,7 +793,7 @@ data:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "jenkins-ui-test-9bfu6"
+  name: "jenkins-ui-test-w3zbv"
   namespace: jenkins
   annotations:
     "helm.sh/hook": test-success
