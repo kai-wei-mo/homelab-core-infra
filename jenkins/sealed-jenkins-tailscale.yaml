@@ -1,0 +1,13 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: jenkins-tailscale
+  namespace: jenkins
+spec:
+  encryptedData:
+    auth-key: AgCobSYudYJffdnE286gus/OkDZB46ND3l7eN3pbVvxz8AZnSIEayaLaOqRJwvo2LVnKYN8/1iUii5r64tOJgePEohrQVy69rARIepjrNmqU5aWfumF1uCCCcZBiLWCyzFb+Lv53gn+lLOwypU1SA67O3aFMp7qPdyqDuwViLtjMpOY2/Ps1WZAYwbdR853z/m3ggNOKn1NUu3+j36RNH4y/0Crxzhlnyb9H9N9J4YY8bZ0UubhdFKEJIsFM/qd5+HbjaGujVAHbwxtM1I4WK92AGcK1rgi27ZXwHs1JFCqIbCeGc+fAm9NrlmJXVB8uf1e+OCPYPCnGm33Rby4JkThb3IzyfYyYfv3KUu2oTBcuRkcgK3KWIMRZDUP8gv0ZXh8XJ0X7dGwGWgGxmBbeRCXJOM6GtrdfPvZtAbBObVpwnm+34R0Dh3x5iFrHafucjypDxSPYyM7xvtgvEtPMOn/7fkI1Q71xOK2ITKSWPFlB0gojEwM9z9d0ilU7fA0IZStgWdWPBJaFNvOan9u/SHK+0LwsDgFqkGzuzbCBT6S80XZyjmgByzc+AALdxSdiORx+2VKBdGbuaCOnULbwfNi7njvGIpznv6yII79qBIP4AqFcEKGS/U3i2g1/DPDdf1M1PtvQc/h5arqtbj8tDnL/wOHn/16Dde/lXePLuxrGDNwuKRjerW0wJn1WYRuGXOa7vsPuwVDpSG0EEcpz/XHNzfPa1x6yW217lg+Q6vUa9tk2qMFUCoFcuzWy5is4HSXLLiKtf8BPtYT5hcyAzuc=
+  template:
+    metadata:
+      name: jenkins-tailscale
+      namespace: jenkins

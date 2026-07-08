@@ -1,0 +1,5 @@
+controller:
+  additionalPlugins:
+    - aws-credentials:262.v0efb_28f71f94
+    - ec2:2053.v86eb_364849fc
+    - job-dsl:3654.vdf58f53e2d15
