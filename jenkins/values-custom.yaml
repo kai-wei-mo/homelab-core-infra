@@ -180,8 +180,8 @@ controller:
                       curl -fsSL https://tailscale.com/install.sh | sh
                       INSTANCE_ID=$(curl -fsSL http://169.254.169.254/latest/meta-data/instance-id || echo unknown)
                       MAC=$(curl -fsSL http://169.254.169.254/latest/meta-data/network/interfaces/macs/ | head -1)
-                      VPC_CIDR=$(curl -fsSL "http://169.254.169.254/latest/meta-data/network/interfaces/macs/${MAC}vpc-ipv4-cidr-block")
-                      tailscale up --authkey='${jenkins-tailscale-auth-key}' --hostname="jenkins-agent-^${INSTANCE_ID}" --advertise-routes="${VPC_CIDR}" --accept-routes
+                      VPC_CIDR=$(curl -fsSL "http://169.254.169.254/latest/meta-data/network/interfaces/macs/^${MAC}vpc-ipv4-cidr-block")
+                      tailscale up --authkey='${jenkins-tailscale-auth-key}' --hostname="jenkins-agent-^${INSTANCE_ID}" --advertise-routes="^${VPC_CIDR}" --accept-routes
                     initScript: |
                       #!/bin/bash
                       set -euo pipefail
