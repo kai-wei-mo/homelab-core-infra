@@ -158,8 +158,8 @@ controller:
                     remoteAdmin: "ubuntu"
                     remoteFS: "/home/ubuntu"
                     numExecutors: 1
-                    securityGroups: "sg-05cc549f72ba7952c"
-                    subnetId: "subnet-079e10bc60a5f3a09"
+                    securityGroups: "sg-06b175c1714a34baf"
+                    subnetId: "subnet-0f4f9a81b2061e67d"
                     iamInstanceProfile: "arn:aws:iam::483469416043:instance-profile/jenkins-agent"
                     associateIPStrategy: PRIVATE_IP
                     connectBySSHProcess: false
