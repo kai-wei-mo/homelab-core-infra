@@ -1,0 +1,88 @@
+service:
+  daemon: off
+  flush: 1
+  log_level: info
+  parsers_file:
+    - /fluent-bit/etc/parsers.conf
+    - /fluent-bit/etc/conf/custom_parsers.conf
+  http_server: on
+  http_listen: 0.0.0.0
+  http_port: 2020
+  health_check: on
+
+pipeline:
+  inputs:
+    - name: tail
+      path: /var/log/containers/*.log
+      # Runtime line splitting only — language stack traces use the multiline filter below
+      multiline.parser:
+        - docker
+        - cri
+      tag: kube.*
+      mem_buf_limit: 5MB
+      skip_long_lines: on
+
+    - name: systemd
+      tag: host.*
+      read_from_tail: on
+      strip_underscores: on
+      db: /var/log/flb_journal.db
+      mem_buf_limit: 10MB
+
+    # Kernel ring buffer (dmesg) — direct from /dev/kmsg
+    - name: kmsg
+      tag: kernel
+      prio_level: 8
+
+  filters:
+    # Stack traces on top of docker/cri reassembly (must run before kubernetes)
+    - name: multiline
+      match: kube.*
+      multiline.key_content: log
+      multiline.parser:
+        - go
+        - java
+        - python
+
+    - name: kubernetes
+      match: kube.*
+      merge_log: on
+      keep_log: off
+      k8s-logging.parser: on
+      k8s-logging.exclude: on
+      labels: on
+      annotations: on
+      owner_references: on
+
+  outputs:
+    - name: loki
+      match: kube.*
+      host: loki-gateway
+      port: 80
+      labels: "fluentbit=true, namespace=$kubernetes['namespace_name'], pod=$kubernetes['pod_name'], container=$kubernetes['container_name'], node=$kubernetes['host'], stream=$stream"
+      auto_kubernetes_labels: off
+      remove_keys: stream
+      line_format: json
+      compress: gzip
+      workers: 2
+      retry_limit: false
+
+    - name: loki
+      match: host.*
+      host: loki-gateway
+      port: 80
+      labels: "fluentbit=true, source=journal, node=${NODE_NAME}, unit=$SYSTEMD_UNIT"
+      line_format: json
+      compress: gzip
+      workers: 2
+      retry_limit: false
+
+    - name: loki
+      match: kernel
+      host: loki-gateway
+      port: 80
+      labels: "fluentbit=true, source=kmsg, node=${NODE_NAME}"
+      line_format: json
+      compress: gzip
+      workers: 1
+      retry_limit: false
