@@ -31,3 +31,11 @@ datasources:
         type: loki
         url: http://loki-gateway.logging.svc.cluster.local
         access: proxy
+
+# Pick up ConfigMaps labeled grafana_dashboard (Fluent Bit, grafana-dashboards, etc.)
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+    searchNamespace: monitoring
