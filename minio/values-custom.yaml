@@ -1,0 +1,23 @@
+## S3 API, data on disk
+
+fullnameOverride: minio
+
+mode: standalone
+
+auth:
+  rootUser: minio
+  rootPassword: minio-homelab   # OK for private network
+
+defaultBuckets: "chunks,ruler"
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+service:
+  type: ClusterIP
+  ports:
+    api: 9000
+
+console:
+  enabled: true
