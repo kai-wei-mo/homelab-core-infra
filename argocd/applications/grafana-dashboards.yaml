@@ -18,3 +18,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      # client-side apply exceeds 256KB annotation limit for large dashboards
+      - ServerSideApply=true
