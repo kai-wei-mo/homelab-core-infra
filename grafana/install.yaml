@@ -66,6 +66,10 @@ data:
       name: Prometheus
       type: prometheus
       url: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+    - access: proxy
+      name: Loki
+      type: loki
+      url: http://loki-gateway.logging.svc.cluster.local
 ---
 # Source: grafana/templates/clusterrole.yaml
 kind: ClusterRole
@@ -181,7 +185,7 @@ spec:
         app.kubernetes.io/instance: grafana
         app.kubernetes.io/version: "12.3.0"
       annotations:
-        checksum/config: d9f831d7908878455495191e4e95e2e4bd802f71a9d7b0d95678ef81b6bdd603
+        checksum/config: 358e704737f2d0edd96281a4d99e36ee472c56ebae092e7960f5dadcfe5237b0
         checksum/sc-dashboard-provider-config: e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24
         checksum/secret: bed677784356b2af7fb0d87455db21f077853059b594101a4f6532bfbd962a7f
         kubectl.kubernetes.io/default-container: grafana
