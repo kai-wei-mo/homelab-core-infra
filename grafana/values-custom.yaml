@@ -27,3 +27,7 @@ datasources:
         url: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
         access: proxy
         isDefault: true
+      - name: Loki
+        type: loki
+        url: http://loki-gateway.logging.svc.cluster.local
+        access: proxy
