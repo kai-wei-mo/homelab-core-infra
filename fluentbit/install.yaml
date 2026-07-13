@@ -1693,7 +1693,8 @@ data:
           port: 80
           labels: "fluentbit=true, namespace=$kubernetes['namespace_name'], pod=$kubernetes['pod_name'], container=$kubernetes['container_name'], node=$kubernetes['host'], stream=$stream"
           auto_kubernetes_labels: off
-          remove_keys: stream
+          remove_keys: stream,kubernetes,time,_p
+          drop_single_key: raw
           line_format: json
           compress: gzip
           workers: 2
@@ -1807,7 +1808,7 @@ spec:
         app.kubernetes.io/name: fluent-bit
         app.kubernetes.io/instance: fluent-bit
       annotations:
-        checksum/config: a102d99a96966aff74c067d37a483bcc72ac84929aaacf23fe949d138d54b736
+        checksum/config: 261b286b00b0b82fbd5e5c7f0ab8bc8cd7326acad7ecb1c1ff8c9e3c0e2cb2e4
     spec:
       
       serviceAccountName: fluent-bit
