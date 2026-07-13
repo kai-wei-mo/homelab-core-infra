@@ -1,3 +1,8 @@
+# cr.fluentbit.io proxies Docker Hub and is flaky (CloudFront resets / rate limits).
+# ghcr.io is the upstream source of truth for Fluent Bit images.
+image:
+  repository: ghcr.io/fluent/fluent-bit
+
 tolerations:
   - operator: Exists
 

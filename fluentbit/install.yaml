@@ -1807,7 +1807,7 @@ spec:
         - name: fluent-bit
           securityContext:
             privileged: true
-          image: "cr.fluentbit.io/fluent/fluent-bit:5.0.9"
+          image: "ghcr.io/fluent/fluent-bit:5.0.9"
           imagePullPolicy: IfNotPresent
           env:
             - name: NODE_NAME
