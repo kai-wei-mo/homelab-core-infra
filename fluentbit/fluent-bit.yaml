@@ -28,6 +28,7 @@ pipeline:
         - docker
         - cri
       tag: kube.*
+      ignore_older: 14d
       mem_buf_limit: 5MB
       skip_long_lines: on
 
