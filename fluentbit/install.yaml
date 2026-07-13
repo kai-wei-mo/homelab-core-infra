@@ -1650,6 +1650,7 @@ data:
             - docker
             - cri
           tag: kube.*
+          ignore_older: 14d
           mem_buf_limit: 5MB
           skip_long_lines: on
     
@@ -1806,12 +1807,28 @@ spec:
         app.kubernetes.io/name: fluent-bit
         app.kubernetes.io/instance: fluent-bit
       annotations:
-        checksum/config: 4f0d32b74611efdb90b61325c1caf01142c520ea6ca9447ebee7d00ce71909f7
+        checksum/config: a102d99a96966aff74c067d37a483bcc72ac84929aaacf23fe949d138d54b736
     spec:
       
       serviceAccountName: fluent-bit
       hostNetwork: false
       dnsPolicy: ClusterFirst
+      initContainers:
+        - command:
+          - sh
+          - -c
+          - |
+            echo 8192 > /mnt/host-proc-sys/fs/inotify/max_user_instances
+            echo 524288 > /mnt/host-proc-sys/fs/inotify/max_user_watches
+            echo "max_user_instances=$(cat /mnt/host-proc-sys/fs/inotify/max_user_instances)"
+            echo "max_user_watches=$(cat /mnt/host-proc-sys/fs/inotify/max_user_watches)"
+          image: busybox:1.36
+          name: raise-inotify-limits
+          securityContext:
+            privileged: true
+          volumeMounts:
+          - mountPath: /mnt/host-proc-sys
+            name: host-proc-sys
       containers:
         - name: fluent-bit
           securityContext:
@@ -1877,6 +1894,9 @@ spec:
             path: /etc/machine-id
             type: File
           name: etcmachineid
+        - hostPath:
+            path: /proc/sys
+          name: host-proc-sys
         - hostPath:
             path: /var/log/journal
           name: varlogjournal
