@@ -4,6 +4,15 @@ fullnameOverride: minio
 
 mode: standalone
 
+# Bitnami moved versioned images off docker.io/bitnami → bitnamilegacy
+image:
+  repository: bitnamilegacy/minio
+
+console:
+  enabled: true
+  image:
+    repository: bitnamilegacy/minio-object-browser
+
 auth:
   rootUser: minio
   rootPassword: minio-homelab   # OK for private network
@@ -18,6 +27,3 @@ service:
   type: ClusterIP
   ports:
     api: 9000
-
-console:
-  enabled: true

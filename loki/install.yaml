@@ -128,7 +128,14 @@ data:
     ruler:
       enable_api: true
       storage:
-        type: local
+        s3:
+          access_key_id: minio
+          bucketnames: ruler
+          endpoint: minio.minio.svc.cluster.local:9000
+          insecure: true
+          s3forcepathstyle: true
+          secret_access_key: minio-homelab
+        type: s3
       wal:
         dir: /var/loki/ruler-wal
     runtime_config:
@@ -1082,7 +1089,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 9943ea30392fdd1abd6f9529fad80a4600a5fdbe6c192443470893bed98019e0
+        checksum/config: 872d028f061aeb48e81c983935c5f77a7b7d2cb4b3591e51c3471a831d219518
         storage/size: 2Gi
         kubectl.kubernetes.io/default-container: "loki"
       labels:
