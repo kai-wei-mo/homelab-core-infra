@@ -35,10 +35,10 @@ loki:
     delete_request_store: s3
   pattern_ingester:
     enabled: true
+  # Chart auto-wires ruler storage to the S3 ruler bucket when object storage is used.
+  # Do not set storage.type: local here — that omits the required directory and crashes Loki.
   rulerConfig:
     enable_api: true
-    storage:
-      type: local
 
 minio:
   enabled: false
