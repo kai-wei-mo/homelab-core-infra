@@ -2,13 +2,22 @@ service:
   daemon: off
   flush: 1
   log_level: info
-  parsers_file:
-    - /fluent-bit/etc/parsers.conf
-    - /fluent-bit/etc/conf/custom_parsers.conf
+  # https://github.com/fluent/fluent-bit/pull/11926
+  # config_format: yaml: Handle list format of parsers_file on service section
+  parsers_file: /fluent-bit/etc/parsers.conf
   http_server: on
   http_listen: 0.0.0.0
   http_port: 2020
   health_check: on
+
+# https://github.com/fluent/fluent-bit/pull/11926
+# config_format: yaml: Handle list format of parsers_file on service section
+parsers:
+  - name: docker_no_time
+    format: json
+    time_keep: off
+    time_key: time
+    time_format: "%Y-%m-%dT%H:%M:%S.%L"
 
 pipeline:
   inputs:
