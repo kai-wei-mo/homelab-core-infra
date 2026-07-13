@@ -71,7 +71,8 @@ pipeline:
       port: 80
       labels: "fluentbit=true, namespace=$kubernetes['namespace_name'], pod=$kubernetes['pod_name'], container=$kubernetes['container_name'], node=$kubernetes['host'], stream=$stream"
       auto_kubernetes_labels: off
-      remove_keys: stream
+      remove_keys: stream,kubernetes,time,_p
+      drop_single_key: raw
       line_format: json
       compress: gzip
       workers: 2
