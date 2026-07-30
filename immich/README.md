@@ -35,11 +35,11 @@ If the SealedSecret reports the Secret already exists, delete the old Argo-manag
 
 ```bash
 helm show values oci://ghcr.io/immich-app/immich-charts/immich \
-  --version 0.11.1 \
+  --version 0.13.1 \
   > values-default.yaml
 
 helm template immich oci://ghcr.io/immich-app/immich-charts/immich \
-  --version 0.11.1 \
+  --version 0.13.1 \
   -n immich \
   -f values-custom.yaml \
   > install.yaml

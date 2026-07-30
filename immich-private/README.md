@@ -12,11 +12,11 @@ A second [Immich](https://immich.app/) (self-hosted photos) instance on Kubernet
 
 ```bash
 helm show values oci://ghcr.io/immich-app/immich-charts/immich \
-  --version 0.12.0 \
+  --version 0.13.1 \
   > values-default.yaml
 
 helm template immich-private oci://ghcr.io/immich-app/immich-charts/immich \
-  --version 0.12.0 \
+  --version 0.13.1 \
   -n immich-private \
   -f values-custom.yaml \
   > install.yaml
