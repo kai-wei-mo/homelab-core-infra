@@ -1,0 +1,11 @@
+source: repo
+repository: https://grafana-community.github.io/helm-charts
+repoName: grafana-community
+chart: loki
+version: "18.4.4"
+releaseName: loki
+namespace: logging
+valuesFiles:
+  - values-custom.yaml
+apiVersions:
+  - monitoring.coreos.com/v1

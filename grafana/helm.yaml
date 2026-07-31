@@ -1,0 +1,9 @@
+source: repo
+repository: https://grafana.github.io/helm-charts
+repoName: grafana
+chart: grafana
+version: "10.4.0"
+releaseName: grafana
+namespace: monitoring
+valuesFiles:
+  - values-custom.yaml

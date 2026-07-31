@@ -1,0 +1,9 @@
+source: repo
+repository: https://prometheus-community.github.io/helm-charts
+repoName: prometheus-community
+chart: alertmanager
+version: "1.33.1"
+releaseName: alertmanager
+namespace: monitoring
+valuesFiles:
+  - values-custom.yaml

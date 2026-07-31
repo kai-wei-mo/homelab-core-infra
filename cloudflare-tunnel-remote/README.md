@@ -1,20 +1,13 @@
 # cloudflared
 
+## Regenerate `install.yaml`
+
+Chart version and render flags live in [`helm.yaml`](helm.yaml).
+
 ```bash
-helm repo add cloudflare https://cloudflare.github.io/helm-charts
-helm repo update
-
-helm show values cloudflare/cloudflare-tunnel-remote \
-  --version 0.1.2 \
-  > values-default.yaml
-
-helm template plex cloudflare/cloudflare-tunnel-remote \
-  --version 0.1.2 \
-  -f values-custom.yaml \
-  > install.yaml
-
-# values.yaml: https://github.com/cloudflare/helm-charts/blob/main/charts/cloudflare-tunnel-remote/values.yaml
+./scripts/render-helm.sh cloudflare-tunnel-remote
 ```
+
 
 
 Step 0 — Create Tunnel (once, locally)

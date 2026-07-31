@@ -1,0 +1,9 @@
+source: repo
+repository: https://k8s-home-lab.github.io/helm-charts/
+repoName: k8s-home-lab
+chart: qbittorrent
+version: "14.4.0"
+releaseName: qbittorrent
+namespace: qbittorrent
+valuesFiles:
+  - values-custom.yaml

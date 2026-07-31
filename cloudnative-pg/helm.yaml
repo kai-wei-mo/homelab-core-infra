@@ -1,0 +1,10 @@
+source: repo
+repository: https://cloudnative-pg.github.io/charts
+repoName: cnpg
+chart: cloudnative-pg
+version: "0.28.0"
+releaseName: cnpg
+namespace: cnpg-system
+includeCrds: true
+valuesFiles:
+  - values-custom.yaml

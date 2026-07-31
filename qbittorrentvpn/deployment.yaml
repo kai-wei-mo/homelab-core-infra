@@ -39,7 +39,7 @@ spec:
               readOnly: true
       containers:
         - name: qbittorrentvpn
-          image: docker.io/dyonr/qbittorrentvpn:latest
+          image: docker.io/dyonr/qbittorrentvpn:v4_2_x
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true

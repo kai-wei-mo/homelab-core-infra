@@ -1,0 +1,106 @@
+name: Render Helm manifests
+
+on:
+  pull_request:
+    paths:
+      - "**/helm.yaml"
+      - "**/values-custom.yaml"
+      - "**/plugins.yaml"
+      - "**/fluent-bit.yaml"
+      - "scripts/render-helm.sh"
+      - ".github/workflows/render-helm.yml"
+  workflow_dispatch:
+    inputs:
+      apps:
+        description: "Space-separated app dirs, or --all"
+        required: false
+        default: "--all"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: render-helm-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.4
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/download/v4.44.6/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: Determine apps to render
+        id: apps
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "list=${{ github.event.inputs.apps }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          mapfile -t changed < <(git diff --name-only "${base}...${head}" || true)
+
+          apps=()
+          script_only=false
+          for f in "${changed[@]:-}"; do
+            case "$f" in
+              */helm.yaml|*/values-custom.yaml|*/plugins.yaml|*/fluent-bit.yaml)
+                dir="${f%%/*}"
+                if [[ -f "$dir/helm.yaml" ]]; then
+                  apps+=("$dir")
+                fi
+                ;;
+              scripts/render-helm.sh|.github/workflows/render-helm.yml)
+                script_only=true
+                ;;
+            esac
+          done
+
+          if [[ ${#apps[@]} -eq 0 ]]; then
+            if [[ "$script_only" == true ]]; then
+              echo "list=--all" >> "$GITHUB_OUTPUT"
+            else
+              echo "list=" >> "$GITHUB_OUTPUT"
+            fi
+            exit 0
+          fi
+
+          list="$(printf '%s\n' "${apps[@]}" | sort -u | paste -sd' ' -)"
+          echo "list=${list}" >> "$GITHUB_OUTPUT"
+
+      - name: Render Helm charts
+        if: steps.apps.outputs.list != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          # shellcheck disable=SC2086
+          ./scripts/render-helm.sh ${{ steps.apps.outputs.list }}
+
+      - name: Commit rendered manifests
+        if: steps.apps.outputs.list != ''
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: render helm manifests"
+          file_pattern: "*/values-default.yaml */install.yaml"
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com

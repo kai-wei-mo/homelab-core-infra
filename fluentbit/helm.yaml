@@ -1,0 +1,14 @@
+source: repo
+repository: https://fluent.github.io/helm-charts
+repoName: fluent
+chart: fluent-bit
+version: "0.57.9"
+releaseName: fluent-bit
+namespace: logging
+valuesFiles:
+  - values-custom.yaml
+apiVersions:
+  - monitoring.coreos.com/v1
+setFiles:
+  - key: 'config.extraFiles.fluent-bit\.yaml'
+    file: fluent-bit.yaml

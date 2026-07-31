@@ -1,0 +1,7 @@
+source: oci
+chart: oci://ghcr.io/immich-app/immich-charts/immich
+version: "0.13.1"
+releaseName: immich
+namespace: immich
+valuesFiles:
+  - values-custom.yaml

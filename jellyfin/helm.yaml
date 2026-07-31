@@ -1,0 +1,9 @@
+source: repo
+repository: https://jellyfin.github.io/jellyfin-helm
+repoName: jellyfin
+chart: jellyfin
+version: "2.7.0"
+releaseName: jellyfin
+namespace: jellyfin
+valuesFiles:
+  - values-custom.yaml

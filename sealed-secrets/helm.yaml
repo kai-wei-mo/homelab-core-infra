@@ -1,0 +1,9 @@
+source: repo
+repository: https://bitnami-labs.github.io/sealed-secrets
+repoName: sealed-secrets
+chart: sealed-secrets
+version: "2.18.3"
+releaseName: sealed-secrets
+includeCrds: true
+valuesFiles:
+  - values-custom.yaml

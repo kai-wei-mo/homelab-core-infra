@@ -10,19 +10,12 @@ A second [Immich](https://immich.app/) (self-hosted photos) instance on Kubernet
 
 ## Regenerate `install.yaml`
 
+Chart version and render flags live in [`helm.yaml`](helm.yaml).
+
 ```bash
-helm show values oci://ghcr.io/immich-app/immich-charts/immich \
-  --version 0.13.1 \
-  > values-default.yaml
-
-helm template immich-private oci://ghcr.io/immich-app/immich-charts/immich \
-  --version 0.13.1 \
-  -n immich-private \
-  -f values-custom.yaml \
-  > install.yaml
-
-# Chart repo: https://github.com/immich-app/immich-charts
+./scripts/render-helm.sh immich-private
 ```
+
 
 ## Storage
 

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "onboarding": false,
+  "dependencyDashboard": true,
+  "automerge": false,
+  "commitMessageAction": "Upgrade",
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "rebaseWhen": "conflicted",
+  "ignorePaths": ["**/install.yaml", "**/values-default.yaml"],
+  "labels": ["dependencies"],
+  "kubernetes": {
+    "fileMatch": ["(^|/)deployment\\.yaml$"]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "HTTP Helm chart versions in helm.yaml",
+      "fileMatch": ["(^|/)helm\\.yaml$"],
+      "matchStrings": [
+        "source: repo\\nrepository: (?<registryUrl>\\S+)\\nrepoName: \\S+\\nchart: (?<depName>\\S+)\\nversion: [\"']?(?<currentValue>[^\"'\\s]+)[\"']?"
+      ],
+      "datasourceTemplate": "helm"
+    },
+    {
+      "customType": "regex",
+      "description": "OCI Helm chart versions in helm.yaml",
+      "fileMatch": ["(^|/)helm\\.yaml$"],
+      "matchStrings": [
+        "source: oci\\nchart: oci://(?<depName>\\S+)\\nversion: [\"']?(?<currentValue>[^\"'\\s]+)[\"']?"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "One PR per app directory",
+      "matchFileNames": ["*/*"],
+      "groupName": "{{packageFileDir}}"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+source: oci
+chart: oci://registry-1.docker.io/bitnamicharts/minio
+version: "17.0.21"
+releaseName: minio
+namespace: minio
+valuesFiles:
+  - values-custom.yaml

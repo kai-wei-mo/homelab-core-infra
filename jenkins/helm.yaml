@@ -1,0 +1,10 @@
+source: repo
+repository: https://charts.jenkins.io
+repoName: jenkins
+chart: jenkins
+version: "5.9.32"
+releaseName: jenkins
+namespace: jenkins
+valuesFiles:
+  - values-custom.yaml
+  - plugins.yaml

@@ -1,0 +1,9 @@
+source: repo
+repository: https://k8s-home-lab.github.io/helm-charts/
+repoName: k8s-home-lab
+chart: audiobookshelf
+version: "2.0.1"
+releaseName: audiobookshelf
+namespace: audiobookshelf
+valuesFiles:
+  - values-custom.yaml

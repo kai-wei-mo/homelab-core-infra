@@ -1,0 +1,8 @@
+source: repo
+repository: https://prometheus-community.github.io/helm-charts
+repoName: prometheus-community
+chart: prometheus-node-exporter
+version: "4.51.1"
+releaseName: prometheus-node-exporter
+valuesFiles:
+  - values-custom.yaml

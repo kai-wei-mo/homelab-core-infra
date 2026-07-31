@@ -1,20 +1,13 @@
 # alertmanager
 
+## Regenerate `install.yaml`
+
+Chart version and render flags live in [`helm.yaml`](helm.yaml).
+
 ```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-
-helm show values prometheus-community/alertmanager \
-  --version 1.33.1 > values-default.yaml
-
-helm template alertmanager prometheus-community/alertmanager \
-  --version 1.33.1 \
-  -n monitoring \
-  -f values-custom.yaml \
-  > install.yaml
-
-# values.yaml: https://github.com/prometheus-community/helm-charts/blob/main/charts/alertmanager/values.yaml
+./scripts/render-helm.sh alertmanager
 ```
+
 
 ## Wise USD/CAD exchange rate alert
 

@@ -1,17 +1,10 @@
 # grafana
 
+## Regenerate `install.yaml`
+
+Chart version and render flags live in [`helm.yaml`](helm.yaml).
+
 ```bash
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-
-helm show values grafana/grafana \
-  --version 10.4.0 > values-default.yaml
-
-helm template grafana grafana/grafana \
-  --version 10.4.0 \
-  -n monitoring \
-  -f values-custom.yaml \
-  > install.yaml
-
-# values.yaml: https://github.com/grafana-community/helm-charts/blob/main/charts/grafana/values.yaml
+./scripts/render-helm.sh grafana
 ```
+

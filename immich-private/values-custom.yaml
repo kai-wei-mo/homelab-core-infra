@@ -2,8 +2,6 @@ controllers:
   main:
     containers:
       main:
-        image:
-          tag: v3.1.0
         env:
           DB_HOSTNAME: immich-private-database-rw.immich-private.svc.cluster.local
           DB_PORT: "5432"

@@ -1,0 +1,8 @@
+source: repo
+repository: https://cloudflare.github.io/helm-charts
+repoName: cloudflare
+chart: cloudflare-tunnel-remote
+version: "0.1.2"
+releaseName: plex
+valuesFiles:
+  - values-custom.yaml

@@ -9,3 +9,11 @@ resources:
   - sealed-db-owner-secret.yaml
   - postgres-cluster.yaml
   - install.yaml
+
+# Immich chart defaults lag app releases
+# and suggests we upgrade versions ourselves.
+images:
+  - name: ghcr.io/immich-app/immich-server
+    newTag: v3.1.0
+  - name: ghcr.io/immich-app/immich-machine-learning
+    newTag: v3.1.0
