@@ -1,5 +1,5 @@
 source: repo
-repository: https://bitnami-labs.github.io/sealed-secrets
+repository: https://bitnami.github.io/sealed-secrets
 repoName: sealed-secrets
 chart: sealed-secrets
 version: "2.18.3"
