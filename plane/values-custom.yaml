@@ -1,0 +1,41 @@
+planeVersion: v1.4.1
+
+ingress:
+  enabled: true
+  appHost: plane.home.chaewon.io
+  minioHost: ""
+  rabbitmqHost: ""
+  ingressClass: traefik
+
+ssl:
+  createIssuer: false
+  generateCerts: false
+  tls_secret_name: home-chaewon-io-wildcard
+
+postgres:
+  local_setup: true
+  volumeSize: 5Gi
+
+redis:
+  local_setup: true
+  volumeSize: 1Gi
+
+rabbitmq:
+  local_setup: true
+  volumeSize: 1Gi
+
+minio:
+  local_setup: true
+  volumeSize: 10Gi
+
+external_secrets:
+  app_env_existingSecret: plane-app-secrets
+  pgdb_existingSecret: plane-pgdb-secrets
+  rabbitmq_existingSecret: plane-rabbitmq-secrets
+  doc_store_existingSecret: plane-doc-store-secrets
+  live_env_existingSecret: plane-live-secrets
+
+env:
+  cors_allowed_origins: "https://plane.home.chaewon.io"
+  pgdb_name: plane
+  pgdb_username: plane

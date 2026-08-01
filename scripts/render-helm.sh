@@ -33,6 +33,7 @@ HELM_APPS=(
   minio
   node-exporter
   plex
+  plane
   prometheus
   qbittorrent
   reflector

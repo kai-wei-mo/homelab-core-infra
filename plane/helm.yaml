@@ -1,0 +1,11 @@
+source: repo
+repository: https://helm.plane.so/
+repoName: plane
+chart: plane-ce
+version: "1.6.2"
+releaseName: plane
+namespace: plane
+valuesFiles:
+  - values-custom.yaml
+apiVersions:
+  - traefik.io/v1alpha1

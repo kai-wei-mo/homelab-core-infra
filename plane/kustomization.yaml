@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: plane
+
+resources:
+  - sealed-plane-app-secrets.yaml
+  - sealed-plane-pgdb-secrets.yaml
+  - sealed-plane-rabbitmq-secrets.yaml
+  - sealed-plane-doc-store-secrets.yaml
+  - sealed-plane-live-secrets.yaml
+  - install.yaml
