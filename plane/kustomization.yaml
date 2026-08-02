@@ -9,4 +9,13 @@ resources:
   - sealed-plane-rabbitmq-secrets.yaml
   - sealed-plane-doc-store-secrets.yaml
   - sealed-plane-live-secrets.yaml
+  - middlewares.yaml
+  - ingressroute.yaml
   - install.yaml
+
+# Chart always renders WEB_URL as http://; force https to match Traefik TLS.
+# Frontend image ships a broken empty hydrate root → React #418; patch via init.
+patches:
+  - path: patch-web-url.yaml
+  - path: patch-web-hydrate.yaml
+  - path: patch-admin-hydrate.yaml

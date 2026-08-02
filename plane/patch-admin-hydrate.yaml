@@ -1,0 +1,48 @@
+# Admin SPA basename is "/god-mode/". A request to /god-mode (no slash) serves
+# index.html but React Router refuses to match. Inject a same-origin replace
+# before the app boots. Also disable nginx port_in_redirect (:3000 leak).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plane-admin-wl
+  namespace: plane
+spec:
+  template:
+    spec:
+      volumes:
+        - name: html
+          emptyDir: {}
+      initContainers:
+        - name: patch-hydrate-fallback
+          image: artifacts.plane.so/makeplane/plane-admin:v1.4.1
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              cp -a /usr/share/nginx/html/. /work/
+              if [ -f /work/god-mode/index.html ]; then
+                # Strip empty hydrate root if present (React #418).
+                sed -i 's|</script><div></div><link rel="modulepreload"|</script><link rel="modulepreload"|g' /work/god-mode/index.html || true
+                # Force trailing slash so <Router basename="/god-mode/"> matches.
+                if ! grep -q 'location.pathname==="/god-mode"' /work/god-mode/index.html; then
+                  sed -i 's|<head>|<head><script>if(location.pathname==="/god-mode")location.replace("/god-mode/"+location.search+location.hash);</script>|' /work/god-mode/index.html
+                fi
+              fi
+              cp /etc/nginx/nginx.conf /work/nginx.conf
+              if ! grep -q 'port_in_redirect' /work/nginx.conf; then
+                sed -i '/listen 3000;/a\    absolute_redirect off;\n    port_in_redirect off;' /work/nginx.conf
+              fi
+          volumeMounts:
+            - name: html
+              mountPath: /work
+      containers:
+        - name: plane-admin
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+            - name: html
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true

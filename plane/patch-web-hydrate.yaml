@@ -1,0 +1,47 @@
+# plane-frontend:v1.4.1 ships index.html with an empty <div></div> as the React
+# root while HydrateFallback returns null until the theme resolves. That mismatch
+# throws React #418/#423. Copy the image HTML into an emptyDir and strip the
+# empty root before nginx serves it.
+# Keep init image tag in sync with planeVersion / plane-web image.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plane-web-wl
+  namespace: plane
+spec:
+  template:
+    spec:
+      volumes:
+        - name: html
+          emptyDir: {}
+      initContainers:
+        - name: patch-hydrate-fallback
+          image: artifacts.plane.so/makeplane/plane-frontend:v1.4.1
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              cp -a /usr/share/nginx/html/. /work/
+              # Match HydrateFallback's null render (theme unresolved).
+              sed -i 's|</script><div></div><link rel="modulepreload"|</script><link rel="modulepreload"|g' /work/index.html
+              # Upstream PR #8826 — stop leaking :3000 on trailing-slash redirects.
+              if [ -f /etc/nginx/nginx.conf ]; then
+                cp /etc/nginx/nginx.conf /work/nginx.conf
+                if ! grep -q 'port_in_redirect' /work/nginx.conf; then
+                  sed -i '/listen 3000;/a\    absolute_redirect off;\n    port_in_redirect off;' /work/nginx.conf
+                fi
+              fi
+          volumeMounts:
+            - name: html
+              mountPath: /work
+      containers:
+        - name: plane-web
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+            - name: html
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true

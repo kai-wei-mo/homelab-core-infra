@@ -1,0 +1,21 @@
+# Path rewrite for nginx only. Browser URL is fixed by a script in
+# patch-admin-hydrate.yaml (React Router basename requires /god-mode/).
+# Do not use redirectRegex here — it has broken Traefik route matching to admin.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: plane-trailing-slash
+  namespace: plane
+spec:
+  replacePathRegex:
+    regex: "^/(god-mode|spaces|live)$"
+    replacement: "/$1/"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: plane-body-limit
+  namespace: plane
+spec:
+  buffering:
+    maxRequestBodyBytes: 20971520

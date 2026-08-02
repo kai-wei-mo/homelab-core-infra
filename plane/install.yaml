@@ -295,7 +295,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.524707 -0500 CDT m=+0.025346293"
     spec:
       containers:
       - name: plane-admin
@@ -341,7 +340,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.524681 -0500 CDT m=+0.025319751"
     spec:
       containers:
       - name: plane-api
@@ -408,7 +406,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.524653 -0500 CDT m=+0.025292251"
     spec:
       containers:
       - name: plane-beat-worker
@@ -466,7 +463,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.524632 -0500 CDT m=+0.025271418"
     spec:
       containers:
       - name: plane-live
@@ -519,7 +515,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.52448 -0500 CDT m=+0.025119001"
     spec:
       containers:
       - name: plane-space
@@ -565,7 +560,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.524456 -0500 CDT m=+0.025095126"
     spec:
       containers:
       - name: plane-web
@@ -611,7 +605,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.524419 -0500 CDT m=+0.025058459"
     spec:
       containers:
       - name: plane-worker
@@ -907,7 +900,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "1.4.1"
       annotations:
-        timestamp: "2026-08-09 11:24:02.524609 -0500 CDT m=+0.025247709"
     spec:
       containers:
       - name: plane-api-migrate
@@ -973,98 +965,3 @@ spec:
       serviceAccount: plane-srv-account
       serviceAccountName: plane-srv-account
       terminationGracePeriodSeconds: 120
----
-# Source: plane-ce/templates/ingress-traefik.yaml
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: plane-ingress
-  labels:
-    helm.sh/chart: plane-ce-1.6.2
-    app.kubernetes.io/name: plane-ce
-    app.kubernetes.io/instance: plane
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "1.4.1"
-  namespace: plane
-spec:
-  entryPoints:
-    - websecure
-
-  routes:
-
-  # IMPORTANT: specific paths FIRST
-
-  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/spaces`)
-    kind: Rule
-    middlewares:
-      - name: plane-body-limit
-    services:
-      - name: plane-space
-        port: 3000
-
-  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/god-mode`)
-    kind: Rule
-    middlewares:
-      - name: plane-body-limit
-    services:
-      - name: plane-admin
-        port: 3000
-
-  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/api`)
-    kind: Rule
-    middlewares:
-      - name: plane-body-limit
-    services:
-      - name: plane-api
-        port: 8000
-
-  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/auth`)
-    kind: Rule
-    middlewares:
-      - name: plane-body-limit
-    services:
-      - name: plane-api
-        port: 8000
-
-  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/live`)
-    kind: Rule
-    middlewares:
-      - name: plane-body-limit
-    services:
-      - name: plane-live
-        port: 3000
-  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/uploads`)
-    kind: Rule
-    middlewares:
-      - name: plane-body-limit
-    services:
-      - name: plane-minio
-        port: 9000
-
-  # LAST: catch all
-  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/`)
-    kind: Rule
-    middlewares:
-      - name: plane-body-limit
-    services:
-      - name: plane-web
-        port: 3000
-
-  tls:
-    secretName: home-chaewon-io-wildcard
----
-# Source: plane-ce/templates/traefik-middleware.yaml
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: plane-body-limit
-  labels:
-    helm.sh/chart: plane-ce-1.6.2
-    app.kubernetes.io/name: plane-ce
-    app.kubernetes.io/instance: plane
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "1.4.1"
-  namespace: plane
-spec:
-  buffering:
-    maxRequestBodyBytes: 2.097152e+07

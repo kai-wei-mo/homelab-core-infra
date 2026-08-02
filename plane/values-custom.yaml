@@ -1,7 +1,10 @@
 planeVersion: v1.4.1
 
+# Chart Traefik IngressRoute is disabled: admin nginx redirects /god-mode →
+# http://host:3000/god-mode/ (port_in_redirect). We own routes in ingressroute.yaml
+# with a Traefik replacePathRegex middleware instead.
 ingress:
-  enabled: true
+  enabled: false
   appHost: plane.home.chaewon.io
   minioHost: ""
   rabbitmqHost: ""
