@@ -66,7 +66,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "1.4.1"
 spec:
-  clusterIP: None
   ports:
   - name: admin-3000
     port: 3000
@@ -89,7 +88,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "1.4.1"
 spec:
-  clusterIP: None
   ports:
   - name: api-8000
     port: 8000
@@ -112,7 +110,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "1.4.1"
 spec:
-  clusterIP: None
   ports:
   - name: live-3000
     port: 3000
@@ -135,7 +132,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "1.4.1"
 spec:
-  clusterIP: None
   ports:
   - name: minio-api-9000
     port: 9000
@@ -235,7 +231,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "1.4.1"
 spec:
-  clusterIP: None
   ports:
   - name: space-3000
     port: 3000
@@ -258,7 +253,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "1.4.1"
 spec:
-  clusterIP: None
   ports:
   - name: web-3000
     port: 3000
@@ -349,8 +343,8 @@ spec:
         tty: true
         resources:
           requests:
-            memory: "50Mi"
-            cpu: "50m"
+            memory: "256Mi"
+            cpu: "250m"
           limits:
             memory: "1000Mi"
             cpu: "500m"
@@ -965,3 +959,98 @@ spec:
       serviceAccount: plane-srv-account
       serviceAccountName: plane-srv-account
       terminationGracePeriodSeconds: 120
+---
+# Source: plane-ce/templates/ingress-traefik.yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: plane-ingress
+  labels:
+    helm.sh/chart: plane-ce-1.6.2
+    app.kubernetes.io/name: plane-ce
+    app.kubernetes.io/instance: plane
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "1.4.1"
+  namespace: plane
+spec:
+  entryPoints:
+    - websecure
+
+  routes:
+
+  # IMPORTANT: specific paths FIRST
+
+  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/spaces`)
+    kind: Rule
+    middlewares:
+      - name: plane-body-limit
+    services:
+      - name: plane-space
+        port: 3000
+
+  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/god-mode`)
+    kind: Rule
+    middlewares:
+      - name: plane-body-limit
+    services:
+      - name: plane-admin
+        port: 3000
+
+  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/api`)
+    kind: Rule
+    middlewares:
+      - name: plane-body-limit
+    services:
+      - name: plane-api
+        port: 8000
+
+  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/auth`)
+    kind: Rule
+    middlewares:
+      - name: plane-body-limit
+    services:
+      - name: plane-api
+        port: 8000
+
+  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/live`)
+    kind: Rule
+    middlewares:
+      - name: plane-body-limit
+    services:
+      - name: plane-live
+        port: 3000
+  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/uploads`)
+    kind: Rule
+    middlewares:
+      - name: plane-body-limit
+    services:
+      - name: plane-minio
+        port: 9000
+
+  # LAST: catch all
+  - match: Host(`plane.home.chaewon.io`) && PathPrefix(`/`)
+    kind: Rule
+    middlewares:
+      - name: plane-body-limit
+    services:
+      - name: plane-web
+        port: 3000
+
+  tls:
+    secretName: home-chaewon-io-wildcard
+---
+# Source: plane-ce/templates/traefik-middleware.yaml
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: plane-body-limit
+  labels:
+    helm.sh/chart: plane-ce-1.6.2
+    app.kubernetes.io/name: plane-ce
+    app.kubernetes.io/instance: plane
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "1.4.1"
+  namespace: plane
+spec:
+  buffering:
+    maxRequestBodyBytes: 2.097152e+07

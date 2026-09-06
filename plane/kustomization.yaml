@@ -9,13 +9,34 @@ resources:
   - sealed-plane-rabbitmq-secrets.yaml
   - sealed-plane-doc-store-secrets.yaml
   - sealed-plane-live-secrets.yaml
-  - middlewares.yaml
-  - ingressroute.yaml
+  - slash-redirect.yaml
   - install.yaml
 
-# Chart always renders WEB_URL as http://; force https to match Traefik TLS.
-# Frontend image ships a broken empty hydrate root → React #418; patch via init.
+# Chart PathPrefix routes send /god-mode to admin nginx, which 301s to :3000.
+# Insert a 302 trailing-slash middleware ahead of the service (regex is exact
+# path only, so /god-mode/ is unchanged).
 patches:
   - path: patch-web-url.yaml
-  - path: patch-web-hydrate.yaml
-  - path: patch-admin-hydrate.yaml
+  - target:
+      group: traefik.io
+      version: v1alpha1
+      kind: IngressRoute
+      name: plane-ingress
+    patch: |-
+      - op: add
+        path: /spec/routes/0/middlewares/0
+        value:
+          name: plane-trailing-slash
+      - op: add
+        path: /spec/routes/1/middlewares/0
+        value:
+          name: plane-trailing-slash
+      - op: add
+        path: /spec/routes/4/middlewares/0
+        value:
+          name: plane-trailing-slash
+      - op: add
+        path: /spec/routes/6/middlewares/0
+        value:
+          name: plane-root-to-god-mode
+

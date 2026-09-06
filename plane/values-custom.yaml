@@ -1,10 +1,7 @@
 planeVersion: v1.4.1
 
-# Chart Traefik IngressRoute is disabled: admin nginx redirects /god-mode →
-# http://host:3000/god-mode/ (port_in_redirect). We own routes in ingressroute.yaml
-# with a Traefik replacePathRegex middleware instead.
 ingress:
-  enabled: false
+  enabled: true
   appHost: plane.home.chaewon.io
   minioHost: ""
   rabbitmqHost: ""
@@ -27,9 +24,28 @@ rabbitmq:
   local_setup: true
   volumeSize: 1Gi
 
+# Headless (clusterIP: None) services make Traefik return 503 for /api/*.
 minio:
   local_setup: true
   volumeSize: 10Gi
+  assign_cluster_ip: true
+
+web:
+  assign_cluster_ip: true
+
+space:
+  assign_cluster_ip: true
+
+admin:
+  assign_cluster_ip: true
+
+live:
+  assign_cluster_ip: true
+
+api:
+  assign_cluster_ip: true
+  cpuRequest: 250m
+  memoryRequest: 256Mi
 
 external_secrets:
   app_env_existingSecret: plane-app-secrets

@@ -1,6 +1,5 @@
-# Chart hardcodes WEB_URL as http:// even when TLS is enabled via tls_secret_name.
-# Access is https://plane.home.chaewon.io
-# Mismatched scheme breaks auth/CORS and can surface as React hydration error #418.
+# Chart hardcodes WEB_URL=http:// even when TLS is on. Plane's own docs
+# want WEB_URL and CORS_ALLOWED_ORIGINS to match the browser origin.
 apiVersion: v1
 kind: ConfigMap
 metadata:

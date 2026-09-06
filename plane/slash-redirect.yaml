@@ -1,0 +1,28 @@
+# Admin nginx 301s /god-mode → http://host:3000/god-mode/. Nothing in this
+# homelab listens on 3000 (Traefik/Tailscale are 80/443 only). 302 on the
+# exact path so browsers are not stuck on a cached :3000 Location.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: plane-trailing-slash
+  namespace: plane
+spec:
+  redirectRegex:
+    regex: "^(https://[^/]+)/(god-mode|spaces|live)$"
+    replacement: "${1}/${2}/"
+    permanent: false
+---
+# First-time setup: the web SPA's "Get started" link hits /god-mode (no slash)
+# which nginx then 301s to :3000. Send `/` straight to admin instead.
+# Remove this middleware (and the kustomize patch on the catch-all route)
+# after instance setup is done, or `/` will keep skipping the web app.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: plane-root-to-god-mode
+  namespace: plane
+spec:
+  redirectRegex:
+    regex: "^(https://[^/]+)/?$"
+    replacement: "${1}/god-mode/"
+    permanent: false
