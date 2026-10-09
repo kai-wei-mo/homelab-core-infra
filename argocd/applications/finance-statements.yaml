@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: finance-statements
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kai-wei-mo/homelab-core-infra.git
+    targetRevision: main
+    path: finance-statements
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: finance-statements
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
