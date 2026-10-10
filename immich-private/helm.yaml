@@ -1,6 +1,6 @@
 source: oci
 chart: oci://ghcr.io/immich-app/immich-charts/immich
-version: "0.13.1"
+version: "0.13.4"
 releaseName: immich-private
 namespace: immich-private
 valuesFiles:
