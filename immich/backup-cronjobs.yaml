@@ -85,7 +85,6 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/component: backup-check
 spec:
-  suspend: true
   schedule: "0 18 * * 0"  # Sunday 18:00 UTC, reads 1/20 of the pack data; the slice rotates each week.
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 10800
@@ -154,7 +153,6 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/component: backup-watch
 spec:
-  suspend: true
   schedule: "30 8 * * *"  # 08:30 UTC, after the 04:15 backup window.
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
