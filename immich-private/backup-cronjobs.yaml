@@ -1,0 +1,221 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-private-backup
+  namespace: immich-private
+  labels:
+    app.kubernetes.io/name: immich-private
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "15 4 * * *"  # Immich writes its database dump at 02:00 UTC; backup runs at 04:15 UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 10800
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: immich-private
+            app.kubernetes.io/component: backup
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          nodeSelector:
+            chaewon.disk: seagate
+          containers:
+            - name: restic
+              image: docker.io/restic/restic:0.19.1
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "/scripts/run.sh", "backup"]
+              env:
+                - name: BACKUP_NAME
+                  value: immich-private
+                - name: BACKUP_PATHS
+                  value: /var/lib/immich2 /mnt/seagate/immich2
+                - name: RESTIC_REPOSITORY
+                  value: s3:s3.us-east-1.amazonaws.com/kwm-immich-private-backup
+              envFrom:
+                - secretRef:
+                    name: immich-private-backup
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: "1"
+                  memory: 2Gi
+              volumeMounts:
+                - name: library
+                  mountPath: /var/lib/immich2
+                  readOnly: true
+                - name: external
+                  mountPath: /mnt/seagate/immich2
+                  readOnly: true
+                - name: cache
+                  mountPath: /cache
+                - name: tmp
+                  mountPath: /tmp
+                - name: script
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: library
+              hostPath:
+                path: /var/lib/immich2
+                type: Directory
+            - name: external
+              hostPath:
+                path: /mnt/seagate/immich2
+                type: Directory
+            - name: cache
+              emptyDir:
+                sizeLimit: 2Gi
+            - name: tmp
+              emptyDir:
+                sizeLimit: 1Gi
+            - name: script
+              configMap:
+                name: immich-private-backup-script
+                defaultMode: 0555
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-private-backup-check
+  namespace: immich-private
+  labels:
+    app.kubernetes.io/name: immich-private
+    app.kubernetes.io/component: backup-check
+spec:
+  suspend: true
+  schedule: "0 18 * * 0"  # Sunday 18:00 UTC, reads 1/20 of the pack data; the slice rotates each week.
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 10800
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 21600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: immich-private
+            app.kubernetes.io/component: backup-check
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          containers:
+            - name: restic
+              image: docker.io/restic/restic:0.19.1
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "/scripts/run.sh", "check"]
+              env:
+                - name: BACKUP_NAME
+                  value: immich-private
+                - name: RESTIC_REPOSITORY
+                  value: s3:s3.us-east-1.amazonaws.com/kwm-immich-private-backup
+              envFrom:
+                - secretRef:
+                    name: immich-private-backup
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+              volumeMounts:
+                - name: cache
+                  mountPath: /cache
+                - name: tmp
+                  mountPath: /tmp
+                - name: script
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: cache
+              emptyDir:
+                sizeLimit: 2Gi
+            - name: tmp
+              emptyDir:
+                sizeLimit: 1Gi
+            - name: script
+              configMap:
+                name: immich-private-backup-script
+                defaultMode: 0555
+---
+# Alerts when the newest snapshot is over 36h old.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-private-backup-watch
+  namespace: immich-private
+  labels:
+    app.kubernetes.io/name: immich-private
+    app.kubernetes.io/component: backup-watch
+spec:
+  suspend: true
+  schedule: "30 8 * * *"  # 08:30 UTC, after the 04:15 backup window.
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: immich-private
+            app.kubernetes.io/component: backup-watch
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          containers:
+            - name: restic
+              image: docker.io/restic/restic:0.19.1
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "/scripts/run.sh", "watch"]
+              env:
+                - name: BACKUP_NAME
+                  value: immich-private
+                - name: RESTIC_REPOSITORY
+                  value: s3:s3.us-east-1.amazonaws.com/kwm-immich-private-backup
+              envFrom:
+                - secretRef:
+                    name: immich-private-backup
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+              volumeMounts:
+                - name: cache
+                  mountPath: /cache
+                - name: tmp
+                  mountPath: /tmp
+                - name: script
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: cache
+              emptyDir:
+                sizeLimit: 1Gi
+            - name: tmp
+              emptyDir:
+                sizeLimit: 256Mi
+            - name: script
+              configMap:
+                name: immich-private-backup-script
+                defaultMode: 0555

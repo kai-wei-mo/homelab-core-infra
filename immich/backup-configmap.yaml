@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-backup-script
+  namespace: immich
+  labels:
+    app.kubernetes.io/name: immich
+    app.kubernetes.io/component: backup
+data:
+  run.sh: |
+    #!/bin/sh
+    # backup: restic backup, then forget 7 daily / 4 weekly / 12 monthly, then prune.
+    # check:   restic check of one 1/20 slice, rotating with the ISO week.
+    # watch:   fail when the newest snapshot is older than 36h.
+    # Immich's own database dump lands at 02:00 UTC; the backup CronJob is 04:15 UTC.
+    set -eu
+
+    mode="${1:?usage: run.sh backup|check|watch}"
+
+    if ! apk add --no-cache curl coreutils >/tmp/apk.log 2>&1; then
+      cat /tmp/apk.log >&2
+      exit 1
+    fi
+
+    : "${BACKUP_NAME:?BACKUP_NAME is required}"
+    : "${RESTIC_REPOSITORY:?RESTIC_REPOSITORY is required}"
+
+    if [ -z "${DISCORD_WEBHOOK_URL:-}" ] || [ "$DISCORD_WEBHOOK_URL" = "REPLACE_ME" ]; then
+      echo "Discord webhook url is still a placeholder" >&2
+      exit 1
+    fi
+
+    export AWS_DEFAULT_REGION=us-east-1
+    export RESTIC_CACHE_DIR=/cache
+    mkdir -p "$RESTIC_CACHE_DIR"
+
+    fail() {
+      trap - EXIT
+      reason="$1"
+      echo "$reason" >&2
+      detail=""
+      if [ -f /tmp/run.log ]; then
+        detail=$(tail -n 40 /tmp/run.log)
+      fi
+      body=$(printf '%s %s failed\n%s\n%s\n' \
+        "$BACKUP_NAME" "$mode" "$reason" "$detail")
+      body=$(printf '%s' "$body" | head -c 1800)
+      payload=$(jq -n --arg content "$body" '{content:$content}')
+      curl -fsS --max-time 20 -X POST \
+        -H "Content-Type: application/json" \
+        -d "$payload" \
+        "$DISCORD_WEBHOOK_URL" \
+        || echo "discord notify failed" >&2
+      exit 1
+    }
+
+    require_secret() {
+      name="$1"
+      eval "value=\${$name:-}"
+      if [ -z "$value" ] || [ "$value" = "REPLACE_ME" ]; then
+        fail "$name is still a placeholder"
+      fi
+    }
+
+    require_secret RESTIC_PASSWORD
+    require_secret AWS_ACCESS_KEY_ID
+    require_secret AWS_SECRET_ACCESS_KEY
+    require_secret DISCORD_WEBHOOK_URL
+
+    trap 'code=$?; trap - EXIT; if [ "$code" -ne 0 ]; then fail "exit ${code}"; fi' EXIT
+
+    run() {
+      if ! "$@" >/tmp/run.log 2>&1; then
+        cat /tmp/run.log >&2
+        fail "command failed: $*"
+      fi
+      cat /tmp/run.log
+    }
+
+    ensure_repo() {
+      if restic cat config >/tmp/run.log 2>&1; then
+        return 0
+      fi
+      cat /tmp/run.log >&2
+      if grep -qi 'wrong password' /tmp/run.log; then
+        fail "restic password was rejected"
+      fi
+      if ! restic init >/tmp/run.log 2>&1; then
+        cat /tmp/run.log >&2
+        fail "restic init failed"
+      fi
+      echo "initialized restic repository"
+    }
+
+    case "$mode" in
+      backup)
+        : "${BACKUP_PATHS:?BACKUP_PATHS is required}"
+        ensure_repo
+        # Word-splitting on BACKUP_PATHS is intentional. Paths have no spaces.
+        # shellcheck disable=SC2086
+        run restic backup --one-file-system --host "$BACKUP_NAME" --tag "$BACKUP_NAME" $BACKUP_PATHS
+        run restic forget --host "$BACKUP_NAME" --tag "$BACKUP_NAME" \
+          --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune
+        ;;
+      check)
+        week=$(date -u +%V)
+        week=${week#0}
+        part=$(((week - 1) % 20 + 1))
+        echo "checking data subset ${part}/20"
+        run restic check --read-data-subset="${part}/20"
+        ;;
+      watch)
+        if ! restic snapshots --latest 1 --json >/tmp/run.log 2>&1; then
+          cat /tmp/run.log >&2
+          if grep -qi 'already locked' /tmp/run.log; then
+            echo "repository is locked by an in-progress backup"
+            exit 0
+          fi
+          fail "could not list snapshots"
+        fi
+        ts=$(jq -r '.[0].time // empty' /tmp/run.log)
+        if [ -z "$ts" ]; then
+          fail "no snapshots in the repository"
+        fi
+        snap=$(date -d "$ts" +%s)
+        now=$(date -u +%s)
+        age=$((now - snap))
+        if [ "$age" -gt 129600 ]; then
+          fail "latest snapshot is ${age}s old (over 36h): ${ts}"
+        fi
+        echo "latest snapshot ${ts} is ${age}s old"
+        ;;
+      *)
+        fail "unknown mode ${mode}"
+        ;;
+    esac
+
+    echo "ok ${BACKUP_NAME} ${mode}"

@@ -4,11 +4,14 @@ kind: Kustomization
 namespace: immich
 
 resources:
+  - backup-configmap.yaml
+  - backup-cronjobs.yaml
+  - install.yaml
   - library-pv.yaml
   - library-pvc.yaml
-  - sealed-db-owner-secret.yaml
   - postgres-cluster.yaml
-  - install.yaml
+  - sealed-backup-secret.yaml
+  - sealed-db-owner-secret.yaml
 
 # Immich chart defaults lag app releases
 # and suggests we upgrade versions ourselves.
