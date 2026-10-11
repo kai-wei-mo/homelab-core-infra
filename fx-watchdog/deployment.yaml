@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: fx-watcher
-          image: kaiweimo/fx_watcher:0.1.1
+          image: kaiweimo/fx-watchdog:0.1.1
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:

@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/kai-wei-mo/homelab-core-infra.git
     targetRevision: main
-    path: fx_watcher
+    path: fx-watchdog
   destination:
     server: https://kubernetes.default.svc
     namespace: market-data
