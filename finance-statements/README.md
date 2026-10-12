@@ -2,7 +2,7 @@
 
 Private statement explorer at **https://statements.home.chaewon.io** (tailnet only).
 
-Image: `kaiweimo/finance-statements:0.2.0` (built from the `finance-statements` repo, no ledger baked in).
+Image: `kaiweimo/finance-statements:0.2.1` (built from the `finance-statements` repo, no ledger baked in).
 
 Ledger files come from a SealedSecret. From that repo, after `statements/` + `config/` are populated:
 
