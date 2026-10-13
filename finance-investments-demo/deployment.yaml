@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance-investments-demo
+  labels:
+    app: finance-investments-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: finance-investments-demo
+  template:
+    metadata:
+      labels:
+        app: finance-investments-demo
+    spec:
+      initContainers:
+        - name: unpack-data
+          image: kaiweimo/finance-investments:0.1.1
+          imagePullPolicy: Always
+          command:
+            - python
+            - -c
+            - import tarfile; tarfile.open("/bundle/bundle.tar.gz", "r:gz").extractall("/work", filter="data")
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          volumeMounts:
+            - name: bundle
+              mountPath: /bundle
+              readOnly: true
+            - name: work
+              mountPath: /work
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - name: finance-investments-demo
+          image: kaiweimo/finance-investments:0.1.1
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: FINANCES_INVESTMENTS_DATA_DIR
+              value: /work/data
+            - name: FINANCES_STATEMENTS_DIR
+              value: /work/statements
+            - name: FINANCES_STATIC_DIR
+              value: /app/frontend/dist
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          volumeMounts:
+            - name: work
+              mountPath: /work
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 25m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: bundle
+          secret:
+            secretName: finance-investments-demo-data
+        - name: work
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault

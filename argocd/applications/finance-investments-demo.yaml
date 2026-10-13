@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: finance-investments-demo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kai-wei-mo/homelab-core-infra.git
+    targetRevision: main
+    path: finance-investments-demo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: finance-investments-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true  # 256KB annotation limit
