@@ -1,13 +1,13 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: fx-watcher
+  name: fx-watchdog
   labels:
     release: prometheus
 spec:
   selector:
     matchLabels:
-      app: fx-watcher
+      app: fx-watchdog
   namespaceSelector:
     matchNames:
       - market-data

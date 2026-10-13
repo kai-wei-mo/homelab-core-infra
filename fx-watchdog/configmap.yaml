@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fx-watcher
+  name: fx-watchdog
 data:
   WISE_API: "https://api.wise-sandbox.com/v1/rates"
   MARKET_TZ: "America/Toronto"

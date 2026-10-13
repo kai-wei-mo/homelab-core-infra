@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fx-watcher
+  name: fx-watchdog
   labels:
-    app: fx-watcher
+    app: fx-watchdog
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fx-watcher
+      app: fx-watchdog
   template:
     metadata:
       labels:
-        app: fx-watcher
+        app: fx-watchdog
     spec:
       containers:
-        - name: fx-watcher
+        - name: fx-watchdog
           image: kaiweimo/fx-watchdog:0.1.1
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
-                name: fx-watcher
+                name: fx-watchdog
           env:
             - name: WISE_TOKEN
               valueFrom:

@@ -6,7 +6,6 @@ namespace: market-data
 resources:
   - configmap.yaml
   - deployment.yaml
-  - ingress.yaml
   - sealed-discord.yaml
   - sealed-wise-token.yaml
   - service.yaml
