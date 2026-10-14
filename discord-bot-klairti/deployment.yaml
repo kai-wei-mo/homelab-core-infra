@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discord-bot-klairti
+  labels:
+    app.kubernetes.io/name: discord-bot-klairti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: discord-bot-klairti
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: discord-bot-klairti
+    spec:
+      containers:
+        - name: karina
+          image: kaiweimo/discord-bot-klairti:0.1.0
+          imagePullPolicy: IfNotPresent
+          command: ["python", "cosmic_bot.py"]
+          envFrom:
+            - configMapRef:
+                name: karina-config
+          env:
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: karina-discord
+                  key: discord-token
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: karina-app
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: karina-app
+                  key: password
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: karina-app
+                  key: dbname
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: karina-minio
+                  key: access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: karina-minio
+                  key: secret-key
+          volumeMounts:
+            - name: state
+              mountPath: /app/runtime_state
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+        - name: winter
+          image: kaiweimo/discord-bot-klairti:0.1.0
+          imagePullPolicy: IfNotPresent
+          command: ["python", "winter_bot.py"]
+          envFrom:
+            - configMapRef:
+                name: karina-config
+          env:
+            - name: WINTER_DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: karina-discord
+                  key: winter-discord-token
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: karina-app
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: karina-app
+                  key: password
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: karina-app
+                  key: dbname
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: karina-minio
+                  key: access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: karina-minio
+                  key: secret-key
+          volumeMounts:
+            - name: state
+              mountPath: /app/runtime_state
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: karina-state
