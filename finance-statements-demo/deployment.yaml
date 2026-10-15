@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: finance-statements-demo
-          image: kaiweimo/finance-statements:0.2.1
+          image: kaiweimo/finance-statements:0.2.2
           imagePullPolicy: Always
           ports:
             - name: http
