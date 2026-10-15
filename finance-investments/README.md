@@ -2,7 +2,7 @@
 
 Private investment explorer at **https://investments.home.chaewon.io** (tailnet only).
 
-Image: `kaiweimo/finance-investments:0.1.0` (built from the `finance-investments` repo, no statements baked in).
+Image: `kaiweimo/finance-investments:0.1.2` (built from the `finance-investments` repo, no statements baked in).
 
 Performance outputs, portfolio names, and icons come from a SealedSecret. Broker statement CSVs are not included. From that repo:
 
