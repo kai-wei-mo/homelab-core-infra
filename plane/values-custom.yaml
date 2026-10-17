@@ -1,4 +1,4 @@
-planeVersion: v1.4.1
+planeVersion: v1.5.0
 
 ingress:
   enabled: true

@@ -32,11 +32,11 @@ patches:
         value:
           name: plane-trailing-slash
       - op: add
-        path: /spec/routes/4/middlewares/0
+        path: /spec/routes/5/middlewares/0
         value:
           name: plane-trailing-slash
       - op: add
-        path: /spec/routes/6/middlewares/0
+        path: /spec/routes/7/middlewares/0
         value:
           name: plane-root-to-god-mode
 
