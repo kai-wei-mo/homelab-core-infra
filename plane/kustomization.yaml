@@ -17,6 +17,16 @@ resources:
 # path only, so /god-mode/ is unchanged).
 patches:
   - path: patch-web-url.yaml
+  # Job pod templates are immutable, need this to upgrade chart
+  - target:
+      group: batch
+      version: v1
+      kind: Job
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-options: Force=true,Replace=true
   - target:
       group: traefik.io
       version: v1alpha1
@@ -39,4 +49,3 @@ patches:
         path: /spec/routes/7/middlewares/0
         value:
           name: plane-root-to-god-mode
-
