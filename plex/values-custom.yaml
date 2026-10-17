@@ -1,3 +1,6 @@
+controller:
+  replicas: 0
+
 env:
   TZ: America/Chicago
   ADVERTISE_IP: "http://plex.home.chaewon.io,https://plex.chaewon.io"
@@ -33,10 +36,10 @@ ingress:
 
 persistence:
   config:
-    enabled: true
+    enabled: false
     size: 10Gi
   media:
-    enabled: true
+    enabled: false
     type: hostPath
     hostPath: /srv/samba/plex
 

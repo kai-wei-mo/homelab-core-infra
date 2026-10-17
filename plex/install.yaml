@@ -1,24 +1,5 @@
 ---
 # Source: plex/templates/common.yaml
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: plex-config
-  labels:
-    app.kubernetes.io/instance: plex
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: plex
-    app.kubernetes.io/version: 1.43.0
-    helm.sh/chart: plex-7.3.0
-  annotations:
-spec:
-  accessModes:
-    - "ReadWriteOnce"
-  resources:
-    requests:
-      storage: "10Gi"
----
-# Source: plex/templates/common.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -54,7 +35,7 @@ metadata:
     helm.sh/chart: plex-7.3.0
 spec:
   revisionHistoryLimit: 3
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
@@ -88,11 +69,6 @@ spec:
             - name: http
               containerPort: 32400
               protocol: TCP
-          volumeMounts:
-            - name: config
-              mountPath: /config
-            - name: media
-              mountPath: /srv/samba/plex
           livenessProbe:
             tcpSocket:
               port: 32400
@@ -120,13 +96,6 @@ spec:
             requests:
               cpu: 250m
               memory: 512Mi
-      volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: plex-config
-        - name: media
-          hostPath:
-            path: /srv/samba/plex
 ---
 # Source: plex/templates/common.yaml
 apiVersion: networking.k8s.io/v1

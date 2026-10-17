@@ -5,5 +5,4 @@ namespace: plex
 
 resources:
   - install.yaml
-
   - sealed-plex-claim.yaml
