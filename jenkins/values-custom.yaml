@@ -1,4 +1,5 @@
 controller:
+  replicas: 0
   serviceType: ClusterIP
 
   admin:

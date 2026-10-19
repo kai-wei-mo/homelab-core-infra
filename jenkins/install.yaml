@@ -495,7 +495,7 @@ metadata:
     "helm.sh/chart": "jenkins-5.13.3"
 spec:
   serviceName: jenkins
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       "app.kubernetes.io/component": "jenkins-controller"
@@ -815,7 +815,7 @@ data:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "jenkins-ui-test-jmzeg"
+  name: "jenkins-ui-test-ubm2k"
   namespace: jenkins
   annotations:
     "helm.sh/hook": test-success
