@@ -1,0 +1,9 @@
+source: repo
+repository: https://helm.goharbor.io
+repoName: harbor
+chart: harbor
+version: "1.19.4"
+releaseName: harbor
+namespace: harbor
+valuesFiles:
+  - values-custom.yaml

@@ -35,4 +35,4 @@ Requires `helm` and [mikefarah/yq](https://github.com/mikefarah/yq).
 
 - Hand-written `deployment.yaml` image tags (fx-watchdog, price_watcher, phishing, health, gluetun, qbittorrentvpn) are tracked via Renovate’s Kubernetes manager.
 - Immich app tags in `immich/values-custom.yaml` and `immich-private/values-custom.yaml` are tracked separately from the chart version.
-- Dashboard JSON under `grafana-dashboards/`, Argo app defs, and stubs (`harbor`, `docs`) are out of scope.
+- Dashboard JSON under `grafana-dashboards/`, Argo app defs, and stubs (`docs`) are out of scope.

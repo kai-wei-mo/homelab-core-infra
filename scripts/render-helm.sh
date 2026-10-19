@@ -25,6 +25,7 @@ HELM_APPS=(
   cloudnative-pg
   fluentbit
   grafana
+  harbor
   immich
   immich-private
   jellyfin

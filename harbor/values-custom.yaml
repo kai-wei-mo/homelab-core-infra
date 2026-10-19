@@ -1,0 +1,49 @@
+# Volumes are ReadWriteOnce on this node for now
+# TODO: Possible shared storage later, so Harbor is not stuck on one node
+# Harbor needs filesystem owners and modes, so we can't use our exFAT Seagate drive
+expose:
+  tls:
+    certSource: secret
+    secret:
+      secretName: home-chaewon-io-wildcard
+  ingress:
+    hosts:
+      core: harbor.home.chaewon.io
+    className: traefik
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: null
+      ingress.kubernetes.io/proxy-body-size: null
+      nginx.ingress.kubernetes.io/ssl-redirect: null
+      nginx.ingress.kubernetes.io/proxy-body-size: null
+      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+
+externalURL: https://harbor.home.chaewon.io
+
+persistence:
+  persistentVolumeClaim:
+    registry:
+      size: 50Gi
+    database:
+      size: 5Gi
+
+existingSecretAdminPassword: harbor-credentials
+existingSecretSecretKey: harbor-credentials
+
+caSecretName: home-chaewon-io-wildcard
+
+core:
+  existingSecret: harbor-credentials
+  existingXsrfSecret: harbor-credentials
+  secretName: harbor-credentials
+
+jobservice:
+  existingSecret: harbor-credentials
+
+registry:
+  existingSecret: harbor-credentials
+  credentials:
+    existingSecret: harbor-credentials
+
+database:
+  external:
+    existingSecret: harbor-credentials
