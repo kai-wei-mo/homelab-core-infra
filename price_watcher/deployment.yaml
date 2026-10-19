@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: price-watcher
-          image: kaiweimo/price_watcher:0.1.0
+          image: harbor.home.chaewon.io/kaiweimo/price_watcher:0.1.0
           imagePullPolicy: Always
           envFrom:
             - configMapRef:

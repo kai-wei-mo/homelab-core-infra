@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: fx-watchdog
-          image: kaiweimo/fx-watchdog:0.1.1
+          image: harbor.home.chaewon.io/kaiweimo/fx-watchdog:0.1.1
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:

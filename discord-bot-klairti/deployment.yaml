@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: karina
-          image: kaiweimo/discord-bot-klairti:0.1.0
+          image: harbor.home.chaewon.io/kaiweimo/discord-bot-klairti:0.1.0
           imagePullPolicy: IfNotPresent
           command: ["python", "cosmic_bot.py"]
           envFrom:
@@ -64,7 +64,7 @@ spec:
               cpu: "1"
               memory: 2Gi
         - name: winter
-          image: kaiweimo/discord-bot-klairti:0.1.0
+          image: harbor.home.chaewon.io/kaiweimo/discord-bot-klairti:0.1.0
           imagePullPolicy: IfNotPresent
           command: ["python", "winter_bot.py"]
           envFrom:

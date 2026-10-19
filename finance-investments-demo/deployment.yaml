@@ -16,7 +16,7 @@ spec:
     spec:
       initContainers:
         - name: unpack-data
-          image: kaiweimo/finance-investments:0.1.2
+          image: harbor.home.chaewon.io/kaiweimo/finance-investments:0.1.2
           imagePullPolicy: Always
           command:
             - python
@@ -42,7 +42,7 @@ spec:
                 - ALL
       containers:
         - name: finance-investments-demo
-          image: kaiweimo/finance-investments:0.1.2
+          image: harbor.home.chaewon.io/kaiweimo/finance-investments:0.1.2
           imagePullPolicy: Always
           ports:
             - name: http

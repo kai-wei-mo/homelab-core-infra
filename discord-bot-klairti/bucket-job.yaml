@@ -10,7 +10,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: bucket
-          image: kaiweimo/discord-bot-klairti:0.1.0
+          image: harbor.home.chaewon.io/kaiweimo/discord-bot-klairti:0.1.0
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
