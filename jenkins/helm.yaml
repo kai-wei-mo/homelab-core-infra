@@ -2,7 +2,7 @@ source: repo
 repository: https://charts.jenkins.io
 repoName: jenkins
 chart: jenkins
-version: "5.9.32"
+version: "5.13.3"
 releaseName: jenkins
 namespace: jenkins
 valuesFiles:

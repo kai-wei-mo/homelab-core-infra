@@ -121,7 +121,7 @@ controller:
                           - envVar:
                               key: "JENKINS_URL"
                               value: "http://jenkins.jenkins.svc.cluster.local:8080/"
-                        image: "jenkins/inbound-agent:3383.vc8881d4b_0e76-1"
+                        image: "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-5-jdk25"
                         privileged: "false"
                         resourceLimitCpu: 512m
                         resourceLimitMemory: 512Mi

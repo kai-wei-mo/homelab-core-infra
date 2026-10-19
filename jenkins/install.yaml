@@ -11,7 +11,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 ---
 # Source: jenkins/templates/config.yaml
 apiVersion: v1
@@ -25,7 +25,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 data:
   apply_config.sh: |-
     set -e
@@ -33,6 +33,9 @@ data:
     # Prevent Setup Wizard when JCasC is enabled
     echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.UpgradeWizard.state
     echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.InstallUtil.lastExecVersion
+    echo "remove all plugins from shared volume"
+    # remove all plugins from shared volume
+    rm -rf /var/jenkins_home/plugins/*
     echo "download plugins"
     # Install missing plugins
     cp /var/jenkins_config/plugins.txt /var/jenkins_home;
@@ -48,13 +51,13 @@ data:
     yes n | cp -i /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins/;
     echo "finished initialization"
   plugins.txt: |-
-    kubernetes:4423.vb_59f230b_ce53
+    kubernetes:4560.vc25b_83890c34
     workflow-aggregator:608.v67378e9d3db_1
-    git:5.10.1
-    configuration-as-code:2089.v970a_0b_a_8cc6d
-    aws-credentials:262.v0efb_28f71f94
-    ec2:2053.v86eb_364849fc
-    job-dsl:3654.vdf58f53e2d15
+    git:5.11.0
+    configuration-as-code:2147.v8a_8d38668c72
+    aws-credentials:265.v8422a_f384cd9
+    ec2:2068.vd80935072db_b_
+    job-dsl:3752.vb_199526b_20c3
 ---
 # Source: jenkins/templates/jcasc-config.yaml
 apiVersion: v1
@@ -67,7 +70,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
     jenkins-jenkins-config: "true"
 data:
   ec2-agents.yaml: |-
@@ -123,7 +126,7 @@ data:
                       - envVar:
                           key: "JENKINS_URL"
                           value: "http://jenkins.jenkins.svc.cluster.local:8080/"
-                    image: "jenkins/inbound-agent:3383.vc8881d4b_0e76-1"
+                    image: "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-5-jdk25"
                     privileged: "false"
                     resourceLimitCpu: 512m
                     resourceLimitMemory: 512Mi
@@ -209,7 +212,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
     jenkins-jenkins-config: "true"
 data:
   litmus-job.yaml: |-
@@ -246,7 +249,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
     jenkins-jenkins-config: "true"
 data:
   jcasc-default-config.yaml: |-
@@ -294,7 +297,7 @@ data:
           templates:
             - name: "default"
               namespace: "jenkins"
-              id: 089cb1132d51658bfd2a4db738e2a9367e34401d60b76bf16db60f734a6f56f2
+              id: c9d68c4ec3d804b12d6c05fe566fc5cfdcb80e116b1b756f0af8c7fdef33b706
               containers:
               - name: "jnlp"
                 alwaysPullImage: false
@@ -303,7 +306,7 @@ data:
                   - envVar:
                       key: "JENKINS_URL"
                       value: "http://jenkins.jenkins.svc.cluster.local:8080/"
-                image: "jenkins/inbound-agent:3383.vc8881d4b_0e76-1"
+                image: "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-5-jdk25"
                 privileged: "false"
                 resourceLimitCpu: 512m
                 resourceLimitMemory: 512Mi
@@ -342,7 +345,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 spec:
   accessModes:
     - "ReadWriteOnce"
@@ -362,7 +365,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 rules:
 - apiGroups: [""]
   resources: ["pods", "pods/exec", "pods/log", "persistentvolumeclaims", "events"]
@@ -384,7 +387,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 rules:
 - apiGroups: [""]
   resources: ["configmaps"]
@@ -403,7 +406,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -424,7 +427,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -445,7 +448,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 spec:
   ports:
     - port: 50000
@@ -467,7 +470,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 spec:
   ports:
     - port: 8080
@@ -489,7 +492,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
 spec:
   serviceName: jenkins
   replicas: 1
@@ -500,13 +503,12 @@ spec:
   template:
     metadata:
       labels:
-        "app.kubernetes.io/name": 'jenkins'
-        "app.kubernetes.io/managed-by": "Helm"
-        "app.kubernetes.io/instance": "jenkins"
-        "app.kubernetes.io/component": "jenkins-controller"
-        "helm.sh/chart": "jenkins-5.9.32"
+        app.kubernetes.io/component: jenkins-controller
+        app.kubernetes.io/instance: jenkins
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: jenkins
       annotations:
-        checksum/config: 85178e22b7560292316b9490f3c7d90347e61ed237b0458c773a67920cb653cd
+        checksum/config: 5c50961bad7d348f4b69c5f74aceb1492f7e6186882328add8a97bda6ae61ce3
     spec:
       enableServiceLinks: false
       securityContext:
@@ -519,11 +521,16 @@ spec:
       automountServiceAccountToken: true
       initContainers:
         - name: config-reload-init
-          image: "docker.io/kiwigrid/k8s-sidecar:2.8.0"
+          image: "docker.io/kiwigrid/k8s-sidecar:2.14.3"
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
             readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           env:
             - name: POD_NAME
               valueFrom:
@@ -551,13 +558,18 @@ spec:
               mountPath: /tmp
 
         - name: "init"
-          image: "docker.io/jenkins/jenkins:2.555.3-jdk21"
+          image: "docker.io/jenkins/jenkins:2.580.2-jdk25"
           imagePullPolicy: "Always"
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
             readOnlyRootFilesystem: true
             runAsGroup: 1000
             runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           command: [ "sh", "/var/jenkins_config/apply_config.sh" ]
           resources:
             limits:
@@ -579,13 +591,18 @@ spec:
               name: tmp-volume
       containers:
         - name: jenkins
-          image: "docker.io/jenkins/jenkins:2.555.3-jdk21"
+          image: "docker.io/jenkins/jenkins:2.580.2-jdk25"
           imagePullPolicy: "Always"
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
             readOnlyRootFilesystem: true
             runAsGroup: 1000
             runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           args: [ "--httpPort=8080"]
           env:
             - name: SECRETS
@@ -660,11 +677,16 @@ spec:
             - mountPath: /tmp
               name: tmp-volume
         - name: config-reload
-          image: "docker.io/kiwigrid/k8s-sidecar:2.8.0"
+          image: "docker.io/kiwigrid/k8s-sidecar:2.14.3"
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
             readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           env:
             - name: POD_NAME
               valueFrom:
@@ -753,7 +775,7 @@ metadata:
     "app.kubernetes.io/managed-by": "Helm"
     "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-controller"
-    "helm.sh/chart": "jenkins-5.9.32"
+    "helm.sh/chart": "jenkins-5.13.3"
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
   name: jenkins
@@ -793,14 +815,14 @@ data:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "jenkins-ui-test-fpius"
+  name: "jenkins-ui-test-jmzeg"
   namespace: jenkins
   annotations:
     "helm.sh/hook": test-success
 spec:
   initContainers:
     - name: "test-framework"
-      image: "docker.io/bats/bats:1.13.0"
+      image: "docker.io/bats/bats:1.14.0"
       command:
         - "bash"
         - "-c"
@@ -814,7 +836,7 @@ spec:
         name: tools
   containers:
     - name: jenkins-ui-test
-      image: "docker.io/jenkins/jenkins:2.555.3-jdk21"
+      image: "docker.io/jenkins/jenkins:2.580.2-jdk25"
       command: ["/tools/bats/bin/bats", "-t", "/tests/run.sh"]
       volumeMounts:
       - mountPath: /tests
