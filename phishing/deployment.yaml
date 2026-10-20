@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phishing
+  labels:
+    app: phishing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phishing
+  template:
+    metadata:
+      labels:
+        app: phishing
+    spec:
+      containers:
+        - name: phishing
+          image: harbor.home.chaewon.io/kaiweimo/phishing:0.1.4
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault

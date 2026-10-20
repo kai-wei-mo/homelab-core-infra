@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: phishing
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: phishing.chaewon.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: phishing
+                port:
+                  number: 80
+    - host: phishing.home.chaewon.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: phishing
+                port:
+                  number: 80
+  tls:
+    - secretName: home-chaewon-io-wildcard
+      hosts:
+        - phishing.home.chaewon.io
