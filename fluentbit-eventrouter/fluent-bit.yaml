@@ -1,0 +1,48 @@
+service:
+  daemon: off
+  flush: 1
+  log_level: info
+  parsers_file: /fluent-bit/etc/parsers.conf
+  http_server: on
+  http_listen: 0.0.0.0
+  http_port: 2020
+  health_check: on
+
+pipeline:
+  inputs:
+    - name: kubernetes_events
+      tag: k8s_events
+      kube_url: https://kubernetes.default.svc
+      db: /fluent-bit/state/k8s-events.db
+
+  filters:
+    # Top-level fields so LogQL `| json | namespace=` / `involvedObject_kind=` work.
+    - name: lua
+      match: k8s_events
+      call: flatten_event
+      code: |
+        function flatten_event(tag, timestamp, record)
+          local obj = record["involvedObject"]
+          local meta = record["metadata"]
+          if type(obj) == "table" then
+            record["involvedObject_kind"] = obj["kind"]
+            record["involvedObject_name"] = obj["name"]
+            record["involvedObject_namespace"] = obj["namespace"]
+            record["namespace"] = obj["namespace"]
+          end
+          if (record["namespace"] == nil or record["namespace"] == "") and type(meta) == "table" then
+            record["namespace"] = meta["namespace"]
+          end
+          return 1, timestamp, record
+        end
+
+  outputs:
+    - name: loki
+      match: k8s_events
+      host: loki-gateway
+      port: 80
+      labels: "fluentbit=true, app=eventrouter, type=$type, namespace=$namespace, reason=$reason, kind=$involvedObject_kind"
+      line_format: json
+      compress: gzip
+      workers: 1
+      retry_limit: false

@@ -24,6 +24,7 @@ HELM_APPS=(
   cloudflare-tunnel-remote
   cloudnative-pg
   fluentbit
+  fluentbit-eventrouter
   grafana
   harbor
   immich

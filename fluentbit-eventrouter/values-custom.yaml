@@ -1,0 +1,39 @@
+# Cluster-wide Kubernetes events (one replica). Complements the fluentbit DaemonSet.
+kind: Deployment
+replicaCount: 1
+
+fullnameOverride: fluent-bit-eventrouter
+
+# cr.fluentbit.io proxies Docker Hub and is flaky (CloudFront resets / rate limits).
+image:
+  repository: ghcr.io/fluent/fluent-bit
+
+rbac:
+  eventsAccess: true
+
+serviceMonitor:
+  enabled: true
+
+dashboards:
+  enabled: false
+
+testFramework:
+  enabled: false
+
+extraVolumes:
+  - name: flb-state
+    emptyDir: {}
+
+extraVolumeMounts:
+  - name: flb-state
+    mountPath: /fluent-bit/state
+
+args:
+  - --workdir=/fluent-bit/etc
+  - --config=/fluent-bit/etc/conf/fluent-bit.yaml
+
+config:
+  service: ""
+  inputs: ""
+  filters: ""
+  outputs: ""
