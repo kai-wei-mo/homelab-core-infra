@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: phishing
-          image: harbor.home.chaewon.io/kaiweimo/phishing:0.1.4
+          image: harbor.home.chaewon.io/kaiweimo/phishing:0.1.5
           imagePullPolicy: Always
           ports:
             - name: http
