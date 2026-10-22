@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plane-web-wl
+  namespace: plane
+spec:
+  template:
+    spec:
+      containers:
+        - name: plane-web
+          volumeMounts:
+            - name: caddyfile
+              mountPath: /etc/caddy/Caddyfile
+              subPath: Caddyfile
+      volumes:
+        - name: caddyfile
+          configMap:
+            name: plane-web-caddy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plane-admin-wl
+  namespace: plane
+spec:
+  template:
+    spec:
+      containers:
+        - name: plane-admin
+          volumeMounts:
+            - name: caddyfile
+              mountPath: /etc/caddy/Caddyfile
+              subPath: Caddyfile
+      volumes:
+        - name: caddyfile
+          configMap:
+            name: plane-admin-caddy

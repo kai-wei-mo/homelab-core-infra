@@ -1,0 +1,82 @@
+# Revert this Caddy override after https://github.com/makeplane/plane/issues/10341 is fixed.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plane-web-caddy
+  namespace: plane
+data:
+  Caddyfile: |
+    {
+    	servers {
+    		trusted_proxies static private_ranges
+    	}
+
+    	order rate_limit before file_server
+    }
+
+    :3000 {
+    	root * /usr/share/caddy/html
+
+    	rate_limit {
+    		zone static {
+    			key {client_ip}
+    			events 2000
+    			window 1m
+    		}
+    	}
+
+    	header {
+    		X-Frame-Options "DENY"
+    		X-Content-Type-Options "nosniff"
+    		X-XSS-Protection "1; mode=block"
+    	}
+
+    	try_files {path} /index.html
+    	file_server
+
+    	log {
+    		output stdout
+    		format console
+    	}
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plane-admin-caddy
+  namespace: plane
+data:
+  Caddyfile: |
+    {
+    	servers {
+    		trusted_proxies static private_ranges
+    	}
+
+    	order rate_limit before file_server
+    }
+
+    :3000 {
+    	root * /usr/share/caddy/html
+
+    	rate_limit {
+    		zone static {
+    			key {client_ip}
+    			events 2000
+    			window 1m
+    		}
+    	}
+
+    	header {
+    		X-Frame-Options "DENY"
+    		X-Content-Type-Options "nosniff"
+    		X-XSS-Protection "1; mode=block"
+    	}
+
+    	try_files {path} /god-mode/index.html
+    	file_server
+
+    	log {
+    		output stdout
+    		format console
+    	}
+    }

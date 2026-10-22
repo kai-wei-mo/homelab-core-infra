@@ -10,6 +10,7 @@ resources:
   - sealed-plane-doc-store-secrets.yaml
   - sealed-plane-live-secrets.yaml
   - slash-redirect.yaml
+  - caddy.yaml
   - install.yaml
 
 # Chart PathPrefix routes send /god-mode to admin nginx, which 301s to :3000.
@@ -17,6 +18,7 @@ resources:
 # path only, so /god-mode/ is unchanged).
 patches:
   - path: patch-web-url.yaml
+  - path: patch-caddy.yaml
   # Job pod templates are immutable, need this to upgrade chart
   - target:
       group: batch
