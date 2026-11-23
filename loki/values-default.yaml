@@ -171,6 +171,10 @@ defaults:
     # -- ipFamilies for all services
     # Ref: https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
     ipFamilies: []
+    # -- publishNotReadyAddresses for all services. Set to false so a pod's Service endpoint is
+    # withdrawn as soon as it becomes unready, instead of staying routable for the full termination
+    # window. Overridable per component via <component>.service.publishNotReadyAddresses.
+    publishNotReadyAddresses: true
   # -- KEDA autoscaling shared configuration for all components that support KEDA
   kedaAutoscaling:
     # -- Prometheus server address for KEDA triggers
@@ -194,8 +198,7 @@ defaults:
       # -- Secret key references for TriggerAuthentication
       secretTargetRef: []
   statefulSetRecreateJob:
-    # -- Enable the PVC resize job for statefulsets. This job will be triggered when the storage size is increased and
-    # will recreate the statefulset to allow resizing of PVCs, which is not natively supported by Kubernetes.
+    # -- When a component sets `*.statefulSetRecreateJob.enabled`, the pre-upgrade Job can patch PVC storage requests and recreate the StatefulSet for podManagementPolicy, serviceName, or volumeClaimTemplates count/name/size changes. It does not migrate storageClass, accessModes, selectors, or VCT labels. See the chart README section StatefulSet immutability.
     patchPVC: true
     image:
       registry: registry.k8s.io
@@ -890,7 +893,7 @@ test:
   enabled: true
   # -- Used to directly query the metrics endpoint of the canary for testing, this approach avoids needing prometheus for testing.
   # This in a newer approach to using prometheusAddress such that tests do not have a dependency on prometheus
-  canaryServiceAddress: 'http://{{ include "loki-canary.fullname" $ }}.{{ include "loki.namespace" $ }}.svc.{{ .Values.global.clusterDomain }}:3500/metrics'
+  canaryServiceAddress: 'http://{{ include "loki.resourceName" (dict "ctx" $ "component" "canary") }}.{{ include "loki.namespace" $ }}.svc.{{ .Values.global.clusterDomain }}:3500/metrics'
   # -- Address of the prometheus server to query for the test. This overrides any value set for canaryServiceAddress.
   # This is kept for backward compatibility and may be removed in future releases. Previous value was 'http://prometheus:9090'
   prometheusAddress: ""
@@ -982,7 +985,7 @@ lokiCanary:
   nodeSelector: {}
   # -- Tolerations for canary pods
   tolerations: []
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for canary pods
   affinity: {}
   # -- Set this toggle to false to opt out of automounting API credentials for the service account
@@ -1365,7 +1368,7 @@ gateway:
     # @schema type:[string, null]
     # -- Pod Disruption Budget unhealthyPodEvictionPolicy
     unhealthyPodEvictionPolicy: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for gateway pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -1610,7 +1613,7 @@ gateway:
     image:
       registry: ghcr.io
       repository: "jkroepke/access-log-exporter"
-      tag: "0.4.6"
+      tag: "0.5.1"
       pullPolicy: IfNotPresent
     # @schema additionalProperties:true
     resources:
@@ -2052,7 +2055,7 @@ singleBinary:
   # @schema type:[boolean, null]
   # -- Use the host's user namespace in the single binary pods
   hostUsers: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for single binary pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -2290,7 +2293,7 @@ write:
   # @schema type:[boolean, null]
   # -- Use the host's user namespace in the write pods.
   hostUsers: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for write pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -2349,6 +2352,10 @@ write:
     # -- Parameters used for the `data` volume when volumeClaimEnabled if false
     dataVolumeParameters:
       emptyDir: {}
+    # -- What to do with the volume when the StatefulSet is scaled down.
+    whenScaled: Delete
+    # -- What to do with the volumes when the StatefulSet is deleted.
+    whenDeleted: Delete
     # -- Enable StatefulSetAutoDeletePVC feature
     enableStatefulSetAutoDeletePVC: false
     # -- Size of persistent disk
@@ -2560,7 +2567,7 @@ read:
   # @schema type:[boolean, null]
   # -- Use the host's user namespace in the read pods.
   hostUsers: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for read pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -2793,7 +2800,7 @@ backend:
   # @schema type:[boolean, null]
   # -- Use the host's user namespace in the backend pods.
   hostUsers: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for backend pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -3019,7 +3026,11 @@ ingester:
   # -- Annotations for ingester
   annotations: {}
   # @schema additionalProperties:{"type":"string"}
-  # -- Labels for ingester pods
+  # -- Labels for ingester pods. Keys used by the workload selectors
+  # (`app.kubernetes.io/name`, `app.kubernetes.io/instance`, `app.kubernetes.io/component`
+  # and, with zoneAwareReplication, `name` and `rollout-group`) are reserved and
+  # ignored here: the latter are also used by the per-zone headless Services and
+  # grafana/rollout-operator.
   podLabels: {}
   # @schema additionalProperties:{"type":"string"}
   # -- Annotations for ingester pods
@@ -3111,7 +3122,7 @@ ingester:
           app.kubernetes.io/component: ingester
           app.kubernetes.io/name: '{{ include "loki.name" . }}'
           app.kubernetes.io/instance: '{{ .Release.Name }}'
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for ingester pods. Ignored if zoneAwareReplication is enabled.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -3522,7 +3533,7 @@ distributor:
     # @schema type:[string, null]
     # -- Pod Disruption Budget unhealthyPodEvictionPolicy
     unhealthyPodEvictionPolicy: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for distributor pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -3798,7 +3809,7 @@ querier:
           app.kubernetes.io/component: querier
           app.kubernetes.io/name: '{{ include "loki.name" . }}'
           app.kubernetes.io/instance: '{{ .Release.Name }}'
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for querier pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -4052,7 +4063,7 @@ queryFrontend:
     # @schema type:[string, null]
     # -- Pod Disruption Budget unhealthyPodEvictionPolicy
     unhealthyPodEvictionPolicy: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for query-frontend pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -4234,7 +4245,7 @@ queryScheduler:
   extraContainers: []
   # -- Grace period to allow the query-scheduler to shutdown before it is killed
   terminationGracePeriodSeconds: 30
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for query-scheduler pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -4444,7 +4455,7 @@ indexGateway:
     unhealthyPodEvictionPolicy: null
   # -- Lifecycle for the index-gateway container
   lifecycle: {}
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for index-gateway pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -4598,7 +4609,7 @@ compactor:
   # @schema additionalProperties:{"type":"string"}
   # -- Annotations for compactor pods
   podAnnotations: {}
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for compactor pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -4785,6 +4796,12 @@ compactor:
 bloomGateway:
   # -- Enable the component. Requires `loki.deploymentMode` to be set to `Distributed`.
   enabled: false
+  # -- Kind of compactor deployment. StatefulSet and Deployment are supported.
+  kind: StatefulSet
+  # -- Enable creating a Job to recreate the StatefulSet when the StatefulSet configuration is changed.
+  ## Only applicable if `compactor.kind` is StatefulSet. Useful for PVC size changes, which require recreating the StatefulSet.
+  statefulSetRecreateJob:
+    enabled: false
   # -- Number of replicas for the bloom-gateway
   replicas: 0
   # -- hostAliases to add
@@ -4795,6 +4812,11 @@ bloomGateway:
   #      - domain.tld
   # -- Use the host's user namespace in the bloom-gateway
   hostUsers: null
+  # @schema skipProperties:true;additionalProperties:true
+  # -- UpdateStrategy or Strategy for the pattern ingester.
+  strategy:
+    rollingUpdate:
+      partition: 0
   # @schema additionalProperties:true
   # -- DNSConfig for bloom-gateway pods
   dnsConfig: {}
@@ -4815,12 +4837,18 @@ bloomGateway:
   # -- The name of the PriorityClass for bloom-gateway pods
   priorityClassName: null
   # @schema additionalProperties:{"type":"string"}
+  # -- Labels for bloom-builder
+  labels: {}
+  # @schema additionalProperties:{"type":"string"}
+  # -- Annotations for bloom-builder
+  annotations: {}
+  # @schema additionalProperties:{"type":"string"}
   # -- Labels for bloom-gateway pods
   podLabels: {}
   # @schema additionalProperties:{"type":"string"}
   # -- Annotations for bloom-gateway pods
   podAnnotations: {}
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for bloom-gateway pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -4934,6 +4962,8 @@ bloomGateway:
   # @deprecated -- This option is deprecated in favor of `bloomGateway.service.appProtocol`
   appProtocol:
     grpc: ""
+  # -- The default is to deploy all pods in parallel.
+  podManagementPolicy: "Parallel"
   persistence:
     # -- Enable creating PVCs for the bloom-gateway
     enabled: false
@@ -4991,6 +5021,12 @@ bloomGateway:
 bloomPlanner:
   # -- Enable the component. Requires `loki.deploymentMode` to be set to `Distributed`.
   enabled: false
+  # -- Kind of compactor deployment. StatefulSet and Deployment are supported.
+  kind: StatefulSet
+  # -- Enable creating a Job to recreate the StatefulSet when the StatefulSet configuration is changed.
+  ## Only applicable if `compactor.kind` is StatefulSet. Useful for PVC size changes, which require recreating the StatefulSet.
+  statefulSetRecreateJob:
+    enabled: false
   # -- Number of replicas for the bloom-planner
   replicas: 0
   # -- hostAliases to add
@@ -5004,6 +5040,11 @@ bloomPlanner:
   # @schema additionalProperties:true
   # -- DNSConfig for bloom-planner pods
   dnsConfig: {}
+  # @schema skipProperties:true;additionalProperties:true
+  # -- UpdateStrategy or Strategy for the pattern ingester.
+  strategy:
+    rollingUpdate:
+      partition: 0
   image:
     # @schema type:[string, null]
     # -- The Docker registry for the bloom-planner image. Overrides `loki.image.registry`
@@ -5021,12 +5062,18 @@ bloomPlanner:
   # -- The name of the PriorityClass for bloom-planner pods
   priorityClassName: null
   # @schema additionalProperties:{"type":"string"}
+  # -- Labels for bloom-builder
+  labels: {}
+  # @schema additionalProperties:{"type":"string"}
+  # -- Annotations for bloom-builder
+  annotations: {}
+  # @schema additionalProperties:{"type":"string"}
   # -- Labels for bloom-planner pods
   podLabels: {}
   # @schema additionalProperties:{"type":"string"}
   # -- Annotations for bloom-planner pods
   podAnnotations: {}
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for bloom-planner pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -5140,6 +5187,8 @@ bloomPlanner:
   # @deprecated -- This option is deprecated in favor of `bloomPlanner.service.appProtocol`
   appProtocol:
     grpc: ""
+  # -- The default is to deploy all pods in parallel.
+  podManagementPolicy: "Parallel"
   persistence:
     # -- Enable creating PVCs for the bloom-planner
     enabled: false
@@ -5384,7 +5433,7 @@ bloomBuilder:
     # @schema type:[string, null]
     # -- Pod Disruption Budget unhealthyPodEvictionPolicy
     unhealthyPodEvictionPolicy: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for bloom-builder pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -5527,7 +5576,7 @@ patternIngester:
   # @schema additionalProperties:{"type":"string"}
   # -- Annotations for pattern ingester pods
   podAnnotations: {}
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for pattern ingester pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -5809,7 +5858,7 @@ ruler:
     # @schema type:[string, null]
     # -- Pod Disruption Budget unhealthyPodEvictionPolicy
     unhealthyPodEvictionPolicy: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for ruler pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -6085,7 +6134,7 @@ overridesExporter:
     # @schema type:[string, null]
     # -- Pod Disruption Budget unhealthyPodEvictionPolicy
     unhealthyPodEvictionPolicy: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for overrides-exporter pods.
   # @default -- Hard node anti-affinity
   # The value will be passed through tpl.
@@ -6140,8 +6189,10 @@ memcached:
   # -- Enable the built in memcached server provided by the chart
   enabled: true
   image:
+    # -- Memcached Docker image registry
+    registry: docker.io
     # -- Memcached Docker image repository
-    repository: memcached
+    repository: library/memcached
     # -- Memcached Docker image tag
     tag: 1.6.45-alpine
     # -- Memcached Docker image pull policy
@@ -6214,8 +6265,13 @@ memcachedExporter:
   # -- Whether memcached metrics should be exported
   enabled: true
   image:
+    # -- Memcached exporter Docker image registry
+    registry: docker.io
+    # -- Memcached exporter Docker image repository
     repository: prom/memcached-exporter
-    tag: v0.16.0
+    # -- Memcached exporter Docker image tag
+    tag: v0.17.0
+    # -- Memcached exporter Docker image pull policy
     pullPolicy: IfNotPresent
   # @schema additionalProperties:true
   resources:
@@ -6308,7 +6364,7 @@ resultsCache:
   # @schema additionalProperties:true
   # -- Node selector for results-cache pods
   nodeSelector: {}
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for results-cache pods
   affinity: {}
   # @schema item:object
@@ -6470,7 +6526,7 @@ chunksCache:
   # @schema additionalProperties:true
   # -- Node selector for chunks-cache pods
   nodeSelector: {}
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for chunks-cache pods
   affinity: {}
   # @schema item:object
@@ -6876,7 +6932,7 @@ sidecar:
     # -- The Docker registry and image for the k8s sidecar
     repository: kiwigrid/k8s-sidecar
     # -- Docker image tag
-    tag: 2.8.1
+    tag: 2.14.1
     # -- Docker image sha. If empty, no sha will be used
     sha: ""
     # -- Docker image pull policy
@@ -7246,7 +7302,7 @@ tableManager:
   # @schema type:[boolean, null]
   # -- Use the host's user namespace in table-manager pods
   hostUsers: null
-  # @schema skipProperties:true;additionalProperties:true
+  # @schema type:[object, null];skipProperties:true;additionalProperties:true
   # -- Affinity for table-manager pods.
   # @default -- Hard node and anti-affinity
   # The value will be passed through tpl.
