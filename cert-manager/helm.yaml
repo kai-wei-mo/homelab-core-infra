@@ -2,7 +2,7 @@ source: repo
 repository: https://charts.jetstack.io
 repoName: jetstack
 chart: cert-manager
-version: "v1.20.3"
+version: "v1.21.3"
 releaseName: cert-manager
 namespace: cert-manager
 includeCrds: true
