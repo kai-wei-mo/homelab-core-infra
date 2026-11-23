@@ -6,10 +6,10 @@ metadata:
   name: reflector
   namespace: monitoring
   labels:
-    helm.sh/chart: reflector-10.0.15
+    helm.sh/chart: reflector-10.0.81
     app.kubernetes.io/name: reflector
     app.kubernetes.io/instance: reflector
-    app.kubernetes.io/version: "10.0.15"
+    app.kubernetes.io/version: "10.0.81"
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: reflector/templates/clusterRole.yaml
@@ -19,10 +19,10 @@ metadata:
   name: reflector
   namespace: monitoring
   labels:
-    helm.sh/chart: reflector-10.0.15
+    helm.sh/chart: reflector-10.0.81
     app.kubernetes.io/name: reflector
     app.kubernetes.io/instance: reflector
-    app.kubernetes.io/version: "10.0.15"
+    app.kubernetes.io/version: "10.0.81"
     app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups: [""]
@@ -39,10 +39,10 @@ metadata:
   name: reflector
   namespace: monitoring
   labels:
-    helm.sh/chart: reflector-10.0.15
+    helm.sh/chart: reflector-10.0.81
     app.kubernetes.io/name: reflector
     app.kubernetes.io/instance: reflector
-    app.kubernetes.io/version: "10.0.15"
+    app.kubernetes.io/version: "10.0.81"
     app.kubernetes.io/managed-by: Helm
 roleRef:
   kind: ClusterRole
@@ -60,10 +60,10 @@ metadata:
   name: reflector
   namespace: monitoring
   labels:
-    helm.sh/chart: reflector-10.0.15
+    helm.sh/chart: reflector-10.0.81
     app.kubernetes.io/name: reflector
     app.kubernetes.io/instance: reflector
-    app.kubernetes.io/version: "10.0.15"
+    app.kubernetes.io/version: "10.0.81"
     app.kubernetes.io/managed-by: Helm
 
 spec:
@@ -91,12 +91,14 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 1000
-          image: "docker.io/emberstack/kubernetes-reflector:10.0.15"
+          image: "docker.io/emberstack/kubernetes-reflector:10.0.81"
           imagePullPolicy: IfNotPresent
           env:
             - name: ES_Serilog__MinimumLevel__Default
               value: "Information"
             - name: ES_Reflector__Watcher__Timeout
+              value: ""
+            - name: ES_Reflector__Watcher__ExcludedNamespaces
               value: ""
             - name: ES_Ignite__KubernetesClient__SkipTlsVerify
               value: "false"
