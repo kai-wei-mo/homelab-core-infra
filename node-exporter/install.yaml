@@ -4,15 +4,15 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: prometheus-node-exporter
-  namespace: grafana
+  namespace: default
   labels:
-    helm.sh/chart: prometheus-node-exporter-4.51.1
+    helm.sh/chart: prometheus-node-exporter-6.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/instance: prometheus-node-exporter
-    app.kubernetes.io/version: "1.10.2"
+    app.kubernetes.io/version: "1.13.1"
 automountServiceAccountToken: false
 ---
 # Source: prometheus-node-exporter/templates/service.yaml
@@ -20,15 +20,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-node-exporter
-  namespace: grafana
+  namespace: default
   labels:
-    helm.sh/chart: prometheus-node-exporter-4.51.1
+    helm.sh/chart: prometheus-node-exporter-6.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/instance: prometheus-node-exporter
-    app.kubernetes.io/version: "1.10.2"
+    app.kubernetes.io/version: "1.13.1"
   annotations:
     prometheus.io/scrape: "true"
 spec:
@@ -47,15 +47,15 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: prometheus-node-exporter
-  namespace: grafana
+  namespace: default
   labels:
-    helm.sh/chart: prometheus-node-exporter-4.51.1
+    helm.sh/chart: prometheus-node-exporter-6.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/instance: prometheus-node-exporter
-    app.kubernetes.io/version: "1.10.2"
+    app.kubernetes.io/version: "1.13.1"
 spec:
   selector:
     matchLabels:
@@ -71,13 +71,12 @@ spec:
       annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
       labels:
-        helm.sh/chart: prometheus-node-exporter-4.51.1
-        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: metrics
-        app.kubernetes.io/part-of: prometheus-node-exporter
-        app.kubernetes.io/name: prometheus-node-exporter
         app.kubernetes.io/instance: prometheus-node-exporter
-        app.kubernetes.io/version: "1.10.2"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: prometheus-node-exporter
+        app.kubernetes.io/part-of: prometheus-node-exporter
+        app.kubernetes.io/version: 1.13.1
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -88,7 +87,7 @@ spec:
       serviceAccountName: prometheus-node-exporter
       containers:
         - name: node-exporter
-          image: quay.io/prometheus/node-exporter:v1.10.2
+          image: quay.io/prometheus/node-exporter:v1.13.1
           imagePullPolicy: IfNotPresent
           args:
             - --path.procfs=/host/proc
@@ -96,8 +95,16 @@ spec:
             - --path.rootfs=/host/root
             - --path.udev.data=/host/root/run/udev/data
             - --web.listen-address=[$(HOST_IP)]:9100
+            - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/containerd/.+|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+            - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|erofs)$
           securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
             readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           env:
             - name: HOST_IP
               value: 0.0.0.0
@@ -115,7 +122,7 @@ spec:
             initialDelaySeconds: 0
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -126,7 +133,7 @@ spec:
             initialDelaySeconds: 0
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           volumeMounts:
             - name: proc
               mountPath: /host/proc
@@ -175,15 +182,15 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: prometheus-node-exporter
-  namespace: grafana
+  namespace: default
   labels:
-    helm.sh/chart: prometheus-node-exporter-4.51.1
+    helm.sh/chart: prometheus-node-exporter-6.0.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: metrics
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/instance: prometheus-node-exporter
-    app.kubernetes.io/version: "1.10.2"
+    app.kubernetes.io/version: "1.13.1"
 spec:
   jobLabel: app.kubernetes.io/name
   
