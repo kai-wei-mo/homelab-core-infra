@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.20.1
   name: sealedsecrets.bitnami.com
 spec:
   group: bitnami.com
@@ -71,7 +71,10 @@ spec:
                   data:
                     additionalProperties:
                       type: string
-                    description: Keys that should be templated using decrypted data.
+                    description: |-
+                      Keys that should be templated using decrypted data.
+                      Set a key with the same name as in `encryptedData`
+                      to `null` to omit the unsealed data from the final secret.
                     nullable: true
                     type: object
                   immutable:
@@ -175,13 +178,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sealed-secrets-controller
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
 ---
 # Source: sealed-secrets/templates/cluster-role.yaml
@@ -191,10 +194,10 @@ metadata:
   name: secrets-unsealer
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
   annotations:
 rules:
@@ -238,10 +241,10 @@ metadata:
   name: sealed-secrets-controller
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
   annotations:
 roleRef:
@@ -252,20 +255,20 @@ subjects:
   - apiGroup: ""
     kind: ServiceAccount
     name: sealed-secrets-controller
-    namespace: jellyfin
+    namespace: default
 ---
 # Source: sealed-secrets/templates/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: sealed-secrets-controller-key-admin
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
   annotations:
 rules:
@@ -290,13 +293,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: sealed-secrets-controller-service-proxier
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
 rules:
   - apiGroups:
@@ -324,13 +327,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: sealed-secrets-controller-key-admin
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
   annotations:
 roleRef:
@@ -341,20 +344,20 @@ subjects:
   - apiGroup: ""
     kind: ServiceAccount
     name: sealed-secrets-controller
-    namespace: jellyfin
+    namespace: default
 ---
 # Source: sealed-secrets/templates/role-binding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: sealed-secrets-controller-service-proxier
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
   annotations:
 roleRef:
@@ -371,13 +374,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sealed-secrets-controller
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
 spec:
   type: ClusterIP
@@ -385,6 +388,7 @@ spec:
     - name: http
       port: 8080
       targetPort: http
+      protocol: TCP
       nodePort: null
   selector:
     app.kubernetes.io/name: sealed-secrets
@@ -395,13 +399,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sealed-secrets-controller-metrics
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
     app.kubernetes.io/component: metrics
 spec:
@@ -410,6 +414,7 @@ spec:
     - name: metrics
       port: 8081
       targetPort: metrics
+      protocol: TCP
       nodePort: null
   selector:
     app.kubernetes.io/name: sealed-secrets
@@ -420,13 +425,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sealed-secrets-controller
-  namespace: jellyfin
+  namespace: default
   labels:
     app.kubernetes.io/name: sealed-secrets
-    helm.sh/chart: sealed-secrets-2.18.3
+    helm.sh/chart: sealed-secrets-2.22.0
     app.kubernetes.io/instance: sealed-secrets
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: 0.36.0
+    app.kubernetes.io/version: 0.41.2
     app.kubernetes.io/part-of: sealed-secrets
   annotations:
 spec:
@@ -443,6 +448,8 @@ spec:
     spec:
       securityContext:
         fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: sealed-secrets-controller
       containers:
         - name: controller
@@ -456,7 +463,7 @@ spec:
             - :8080
             - --listen-metrics-addr
             - :8081
-          image: docker.io/bitnami/sealed-secrets-controller:0.36.0
+          image: docker.io/bitnami/sealed-secrets-controller:0.41.2
           imagePullPolicy: IfNotPresent
           env:
             - name: GOMEMLIMIT
@@ -467,8 +474,10 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+              protocol: TCP
             - name: metrics
               containerPort: 8081
+              protocol: TCP
           livenessProbe:
             failureThreshold: 3
             initialDelaySeconds: 0
@@ -494,6 +503,7 @@ spec:
               cpu: 25m
               memory: 32Mi
           securityContext:
+            allowPrivilegeEscalation: false
             capabilities:
               drop:
               - ALL
