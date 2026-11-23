@@ -2,7 +2,7 @@ source: repo
 repository: https://helm.plane.so/
 repoName: plane
 chart: plane-ce
-version: "1.6.2"
+version: "1.9.1"
 releaseName: plane
 namespace: plane
 valuesFiles:
