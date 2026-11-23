@@ -5,10 +5,10 @@ kind: ServiceAccount
 metadata:
   name: jellyfin
   labels:
-    helm.sh/chart: jellyfin-2.7.0
+    helm.sh/chart: jellyfin-3.7.0
     app.kubernetes.io/name: jellyfin
     app.kubernetes.io/instance: jellyfin
-    app.kubernetes.io/version: "10.11.5"
+    app.kubernetes.io/version: "12.4"
     app.kubernetes.io/managed-by: Helm
 automountServiceAccountToken: true
 ---
@@ -18,10 +18,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: jellyfin-config
   labels:
-    helm.sh/chart: jellyfin-2.7.0
+    helm.sh/chart: jellyfin-3.7.0
     app.kubernetes.io/name: jellyfin
     app.kubernetes.io/instance: jellyfin
-    app.kubernetes.io/version: "10.11.5"
+    app.kubernetes.io/version: "12.4"
     app.kubernetes.io/managed-by: Helm
 spec:
   accessModes:
@@ -36,15 +36,15 @@ kind: Service
 metadata:
   name: jellyfin
   labels:
-    helm.sh/chart: jellyfin-2.7.0
+    helm.sh/chart: jellyfin-3.7.0
     app.kubernetes.io/name: jellyfin
     app.kubernetes.io/instance: jellyfin
-    app.kubernetes.io/version: "10.11.5"
+    app.kubernetes.io/version: "12.4"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
-    - name: http
+    - name: service
       port: 8096
       protocol: TCP
       targetPort: http
@@ -58,15 +58,16 @@ kind: Deployment
 metadata:
   name: jellyfin
   labels:
-    helm.sh/chart: jellyfin-2.7.0
+    helm.sh/chart: jellyfin-3.7.0
     app.kubernetes.io/name: jellyfin
     app.kubernetes.io/instance: jellyfin
-    app.kubernetes.io/version: "10.11.5"
+    app.kubernetes.io/version: "12.4"
     app.kubernetes.io/managed-by: Helm
 spec:
   strategy:
     type: RollingUpdate
   replicas: 1
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: jellyfin
@@ -74,10 +75,10 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: jellyfin-2.7.0
+        helm.sh/chart: jellyfin-3.7.0
         app.kubernetes.io/name: jellyfin
         app.kubernetes.io/instance: jellyfin
-        app.kubernetes.io/version: "10.11.5"
+        app.kubernetes.io/version: "12.4"
         app.kubernetes.io/managed-by: Helm
     spec:
       serviceAccountName: jellyfin
@@ -87,20 +88,28 @@ spec:
         - name: jellyfin
           securityContext:
             {}
-          image: "docker.io/jellyfin/jellyfin:10.11.5"
+          image: "docker.io/jellyfin/jellyfin:12.4"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8096
               protocol: TCP
+          startupProbe:
+            failureThreshold: 30
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: http
           livenessProbe:
-            initialDelaySeconds: 10
-            tcpSocket:
+            httpGet:
+              path: /health
               port: http
+            initialDelaySeconds: 10
           readinessProbe:
-            initialDelaySeconds: 10
-            tcpSocket:
+            httpGet:
+              path: /health
               port: http
+            initialDelaySeconds: 10
           resources:
             {}
           volumeMounts:
@@ -108,6 +117,9 @@ spec:
               name: config
             - mountPath: /media
               name: media
+              readOnly: true
+            - mountPath: /cache
+              name: cache
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -116,6 +128,8 @@ spec:
           hostPath:
             path: /mnt/seagate/jellyfin
             type: Directory
+        - name: cache
+          emptyDir: {}
 ---
 # Source: jellyfin/templates/ingress.yaml
 apiVersion: networking.k8s.io/v1
@@ -123,10 +137,10 @@ kind: Ingress
 metadata:
   name: jellyfin
   labels:
-    helm.sh/chart: jellyfin-2.7.0
+    helm.sh/chart: jellyfin-3.7.0
     app.kubernetes.io/name: jellyfin
     app.kubernetes.io/instance: jellyfin
-    app.kubernetes.io/version: "10.11.5"
+    app.kubernetes.io/version: "12.4"
     app.kubernetes.io/managed-by: Helm
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
