@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: echo
-          image: hashicorp/http-echo:0.2.3
+          image: hashicorp/http-echo:1.0.0
           args:
             - "-text=OK - service healthy"
           ports:
