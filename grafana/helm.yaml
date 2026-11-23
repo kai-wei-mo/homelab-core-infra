@@ -2,7 +2,7 @@ source: repo
 repository: https://grafana.github.io/helm-charts
 repoName: grafana
 chart: grafana
-version: "10.4.0"
+version: "10.5.15"
 releaseName: grafana
 namespace: monitoring
 valuesFiles:
