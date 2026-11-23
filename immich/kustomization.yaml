@@ -17,6 +17,6 @@ resources:
 # and suggests we upgrade versions ourselves.
 images:
   - name: ghcr.io/immich-app/immich-server
-    newTag: v3.4.1
+    newTag: v3.4.2
   - name: ghcr.io/immich-app/immich-machine-learning
-    newTag: v3.4.1
+    newTag: v3.4.2
