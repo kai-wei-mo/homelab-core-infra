@@ -2,7 +2,7 @@ source: repo
 repository: https://fluent.github.io/helm-charts
 repoName: fluent
 chart: fluent-bit
-version: "0.57.9"
+version: "0.58.3"
 releaseName: fluent-bit
 namespace: logging
 valuesFiles:
