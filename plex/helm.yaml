@@ -2,7 +2,7 @@ source: repo
 repository: https://k8s-home-lab.github.io/helm-charts/
 repoName: k8s-home-lab
 chart: plex
-version: "7.3.0"
+version: "7.3.2"
 releaseName: plex
 valuesFiles:
   - values-custom.yaml
