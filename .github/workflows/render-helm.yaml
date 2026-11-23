@@ -98,7 +98,7 @@ jobs:
 
       - name: Commit rendered manifests
         if: steps.apps.outputs.list != ''
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: render helm manifests"
           file_pattern: "*/values-default.yaml */install.yaml"
