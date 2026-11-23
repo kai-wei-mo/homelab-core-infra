@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/instance: plex
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plex
-    app.kubernetes.io/version: 1.43.0
-    helm.sh/chart: plex-7.3.0
+    app.kubernetes.io/version: 1.43.5
+    helm.sh/chart: plex-7.3.2
   annotations:
 spec:
   accessModes:
@@ -27,8 +27,8 @@ metadata:
     app.kubernetes.io/instance: plex
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plex
-    app.kubernetes.io/version: 1.43.0
-    helm.sh/chart: plex-7.3.0
+    app.kubernetes.io/version: 1.43.5
+    helm.sh/chart: plex-7.3.2
   annotations:
 spec:
   type: ClusterIP
@@ -50,8 +50,8 @@ metadata:
     app.kubernetes.io/instance: plex
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plex
-    app.kubernetes.io/version: 1.43.0
-    helm.sh/chart: plex-7.3.0
+    app.kubernetes.io/version: 1.43.5
+    helm.sh/chart: plex-7.3.2
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -74,7 +74,7 @@ spec:
       enableServiceLinks: true
       containers:
         - name: plex
-          image: "ghcr.io/home-operations/plex:1.43.0"
+          image: "ghcr.io/home-operations/plex:1.43.5"
           imagePullPolicy: IfNotPresent
           env:
             - name: ADVERTISE_IP
@@ -137,8 +137,8 @@ metadata:
     app.kubernetes.io/instance: plex
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plex
-    app.kubernetes.io/version: 1.43.0
-    helm.sh/chart: plex-7.3.0
+    app.kubernetes.io/version: 1.43.5
+    helm.sh/chart: plex-7.3.2
 spec:
   ingressClassName: traefik
   tls:
